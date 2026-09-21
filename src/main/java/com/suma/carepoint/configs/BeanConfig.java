@@ -15,7 +15,7 @@ public class BeanConfig {
             // Only BillingDto -> Billing
             modelMapper.typeMap(CreatePatientRequest.class, Patient.class)
                     .addMappings(mapper -> {
-                        mapper.skip(Patient::setId);
+                        mapper.skip(Patient::setPatientId);
                     });
             return modelMapper;
         }

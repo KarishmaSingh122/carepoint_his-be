@@ -2,9 +2,7 @@ package com.suma.carepoint.entities.patient;
 
 
 import com.suma.carepoint.entities.base.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -18,8 +16,13 @@ import java.time.LocalDate;
 @Table(name = "patients")
 public class Patient extends BaseEntity {
 
-    @Column(name = "patient_no", length = 30, nullable = false, unique = true)
-    private String patientNo;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "patient_id")
+    private Long patientId;
+
+    @Column(name = "abha_id")
+    private String abhaId;
 
     @Column(name = "first_name", length = 100, nullable = false)
     private String firstName;
@@ -30,11 +33,9 @@ public class Patient extends BaseEntity {
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "gender", length = 20)
-    private String gender;
-
-    @Column(name = "abha_id")
-    private String abhaId;
+    private Gender gender;
 
     @Column(name = "blood_group", length = 10)
     private String bloodGroup;
@@ -62,4 +63,7 @@ public class Patient extends BaseEntity {
 
     @Column(name = "emergency_contact_phone", length = 20)
     private String emergencyContactPhone;
+
+    @Column(name = "active", nullable = false)
+    private boolean active = true;
 }

@@ -74,7 +74,6 @@ public class PatientServiceImpl implements PatientService{
         try {
             Patient patient = patientRepository.findById(patientId).orElseThrow(() -> new RuntimeException("Patient not found"));
 
-            patient.setPatientNo(request.getPatientNo());
             patient.setCity(request.getCity());
             patient.setAddress(request.getAddress());
             patient.setEmail(request.getEmail());

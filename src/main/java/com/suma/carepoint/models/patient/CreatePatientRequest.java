@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class CreatePatientRequest {
 
-    private String patientNo;
+    private String abhaId;
 
     private String firstName;
 
