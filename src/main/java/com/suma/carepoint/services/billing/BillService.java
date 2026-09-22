@@ -5,6 +5,8 @@ import com.suma.carepoint.models.billing.BillResponse;
 import com.suma.carepoint.models.billing.CreateBillRequest;
 import org.jspecify.annotations.Nullable;
 
+import java.util.List;
+
 public interface BillService {
 
     BillResponse createBill(CreateBillRequest request);
@@ -12,4 +14,6 @@ public interface BillService {
     BillResponse getBillByBillId(Long billId);
 
     BillResponse getBillByBillNo(String billNo);
+
+    List<BillResponse> getBills();
 }

@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -256,10 +257,6 @@ public class BillServiceImpl implements BillService{
         return getBillByBillId(savedBill.getBillId());
     }
 
-    // =============================================================
-    // Generate Bill Number
-    // =============================================================
-
     private String generateBillNumber() {
 
         return "BILL-"
@@ -292,106 +289,24 @@ public class BillServiceImpl implements BillService{
         return buildBillResponse(bill);
     }
 
-//    private BillResponse buildBillResponse(Bill bill) {
-//
-//        /*
-//         * ---------------------------------------------------------
-//         * 1. Map basic Bill information
-//         * ---------------------------------------------------------
-//         */
-//        BillResponse response = modelMapper.map(bill, BillResponse.class);
-//
-//        /*
-//         * ---------------------------------------------------------
-//         * 2. Fetch Bill Items
-//         * ---------------------------------------------------------
-//         */
-//        List<BillItem> billItems =
-//                billItemRepository.findByBillBillId(bill.getBillId());
-//
-//        List<BillItemResponse> itemResponses = billItems.stream()
-//                .map(item -> {
-//
-//                    BillItemResponse itemResponse =
-//                            modelMapper.map(item, BillItemResponse.class);
-//
-//                    /*
-//                     * Service information
-//                     */
-//                    if (item.getService() != null) {
-//                        itemResponse.setServiceId(
-//                                item.getService().getServiceId()
-//                        );
-//
-//                        itemResponse.setServiceName(
-//                                item.getService().getServiceName()
-//                        );
-//                    }
-//
-//                    return itemResponse;
-//                })
-//                .toList();
-//
-//        response.setItems(itemResponses);
-//
-//        /*
-//         * ---------------------------------------------------------
-//         * 3. Fetch Payments
-//         * ---------------------------------------------------------
-//         */
-//        List<Payment> payments =
-//                paymentRepository.findByBillBillId(bill.getBillId());
-//
-//        List<PaymentResponse> paymentResponses = payments.stream()
-//                .map(payment ->
-//                        modelMapper.map(payment, PaymentResponse.class)
-//                )
-//                .toList();
-//
-//        response.setPayments(paymentResponses);
-//
-//        /*
-//         * ---------------------------------------------------------
-//         * 4. Calculate Paid Amount
-//         * ---------------------------------------------------------
-//         *
-//         * Only successful payments should contribute to the
-//         * amount paid.
-//         */
-//        BigDecimal paidAmount = payments.stream()
-//                .filter(payment ->
-//                        payment.getPaymentStatus() != null
-//                                && payment.getPaymentStatus().name().equals("SUCCESS")
-//                )
-//                .map(Payment::getAmount)
-//                .filter(amount -> amount != null)
-//                .reduce(BigDecimal.ZERO, BigDecimal::add);
-//
-//        /*
-//         * ---------------------------------------------------------
-//         * 5. Calculate Balance
-//         * ---------------------------------------------------------
-//         */
-//        BigDecimal totalAmount =
-//                bill.getTotalAmount() != null
-//                        ? bill.getTotalAmount()
-//                        : BigDecimal.ZERO;
-//
-//        BigDecimal balanceAmount =
-//                totalAmount.subtract(paidAmount);
-//
-//        /*
-//         * Avoid negative balance
-//         */
-//        if (balanceAmount.compareTo(BigDecimal.ZERO) < 0) {
-//            balanceAmount = BigDecimal.ZERO;
-//        }
-//
-//        response.setPaidAmount(paidAmount);
-//        response.setBalanceAmount(balanceAmount);
-//
-//        return response;
-//    }
+    @Override
+    public List<BillResponse> getBills() {
+        try {
+            List<Bill> bills = billRepository.findAll();
+            if (bills.isEmpty()) {
+                return Collections.emptyList();
+            }
+            return bills.stream()
+                    .map(this::buildBillResponse)
+                    .toList();
+        } catch (Exception e) {
+            log.error("Error while fetching bills", e);
+            throw new RuntimeException("Failed to fetch bills", e);
+        }
+    }
+
+
+
 
     private BillResponse buildBillResponse(Bill bill) {
 

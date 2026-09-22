@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(ApiConstant.Controller.BILL)
 @AllArgsConstructor
@@ -22,6 +24,13 @@ public class BillController {
     public ResponseEntity<ApiResponse> createBill(@RequestBody CreateBillRequest request) {
         BillResponse billResponse = billService.createBill( request);
         return ResponseEntity.ok().body(new ApiResponse(1, "", billResponse));
+
+    }
+
+    @GetMapping(ApiConstant.Bill.BILLS)
+    public ResponseEntity<ApiResponse> getBills() {
+        List<BillResponse> billResponseList = billService.getBills();
+        return ResponseEntity.ok().body(new ApiResponse(1, "", billResponseList));
 
     }
 
