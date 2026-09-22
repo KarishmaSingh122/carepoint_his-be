@@ -30,4 +30,27 @@ public class ApiConstant {
 
 
     }
+
+    public static final class Department {
+        private Department() {}
+
+        public static final String BASE = "/api/departments";
+        public static final String CREATE = BASE;
+        public static final String GET_BY_ID = BASE + "/{departmentId}";
+        public static final String GET_ALL = BASE;
+        public static final String UPDATE = BASE + "/{departmentId}";
+        public static final String UPDATE_STATUS = BASE + "/{departmentId}/status";
+        public static final String DELETE = BASE + "/{departmentId}";
+        public static final String GET_ACTIVE = BASE + "/active";
+    }
+
+    public static final class Regexp {
+        private Regexp() {}
+
+        public static final String ALPHANUMERIC_DASH_UNDERSCORE = "^[A-Za-z0-9_-]+$";
+        public static final String ALPHA_ONLY = "^[A-Za-z]+$";
+        public static final String NUMERIC_ONLY = "^[0-9]+$";
+
+    }
+
 }
