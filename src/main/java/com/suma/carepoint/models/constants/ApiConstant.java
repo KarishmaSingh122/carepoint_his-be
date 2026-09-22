@@ -11,6 +11,9 @@ public class ApiConstant {
         }
 
          public static final String HMIS = "api/hmis";
+         public static final String BILL = "api/billing";
+         public static final String HOSPITAL_SERVICE = "api/services";
+
 
 
     }
@@ -28,6 +31,13 @@ public class ApiConstant {
         public static final String UPDATE ="/update";
         public static final String DELETE ="/delete";
 
+    }
+
+    public static class Bill{
+        private Bill(){}
+
+        public static final String BILLS = "/bills";
+        public static final String BILLS_BY_NUMBER = "/bills/by-number";
 
     }
 
@@ -52,5 +62,17 @@ public class ApiConstant {
         public static final String NUMERIC_ONLY = "^[0-9]+$";
 
     }
+
+
+    public static class HosptalService{
+        private HosptalService(){}
+
+        public static final String SERVICE = "/service";
+        public static final String SERVICE_CATEGORY = "/service/service-category";
+
+
+
+    }
+
 
 }
