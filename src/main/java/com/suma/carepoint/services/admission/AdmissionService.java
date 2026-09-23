@@ -9,7 +9,6 @@ public interface AdmissionService {
 
     ApiResponse getAdmissionById(Long admissionId);
 
-
     ApiResponse getAllAdmissions();
 
     ApiResponse deleteAdmissionById(Long admissionId);
