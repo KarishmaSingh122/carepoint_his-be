@@ -1,13 +1,13 @@
-package com.suma.carepoint.services.department;
+package com.suma.carepoint.services.organization;
 
-import com.suma.carepoint.entities.department.Department;
+import com.suma.carepoint.entities.organization.Department;
 import com.suma.carepoint.exceptions.ConflictException;
 import com.suma.carepoint.exceptions.ResourceNotFoundException;
-import com.suma.carepoint.models.department.DepartmentRequest;
-import com.suma.carepoint.models.department.DepartmentResponse;
+import com.suma.carepoint.models.organization.DepartmentRequest;
+import com.suma.carepoint.models.organization.DepartmentResponse;
 import com.suma.carepoint.models.utility.PageResponse;
 import com.suma.carepoint.models.mapper.DepartmentMapper;
-import com.suma.carepoint.repositories.department.DepartmentRepository;
+import com.suma.carepoint.repositories.organization.DepartmentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -16,7 +16,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import static com.suma.carepoint.models.utility.PageResponse.buildPageResponse;
@@ -25,14 +24,12 @@ import static com.suma.carepoint.models.utility.PageResponse.validatePagination;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Transactional(readOnly = true)
 public class DepartmentServiceImpl implements DepartmentService {
 
     private final DepartmentRepository departmentRepository;
     private final DepartmentMapper departmentMapper;
 
     @Override
-    @Transactional
     public DepartmentResponse createDepartment(DepartmentRequest request) {
         String departmentCode = normalize(request.getDepartmentCode());
         String departmentName = normalize(request.getDepartmentName());
@@ -80,7 +77,6 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
-    @Transactional
     public DepartmentResponse updateDepartment(Long departmentId, DepartmentRequest request) {
         Department department = findDepartmentById(departmentId);
         String departmentCode = normalize(request.getDepartmentCode());
@@ -101,7 +97,6 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
-    @Transactional
     public DepartmentResponse updateDepartmentStatus(Long departmentId, boolean status) {
         Department department = findDepartmentById(departmentId);
         boolean oldStatus = department.isActive();
@@ -113,7 +108,6 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
-    @Transactional
     public void deleteDepartment(Long departmentId) {
         Department department = findDepartmentById(departmentId);
         departmentRepository.delete(department);

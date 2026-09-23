@@ -1,6 +1,6 @@
-package com.suma.carepoint.repositories.department;
+package com.suma.carepoint.repositories.organization;
 
-import com.suma.carepoint.entities.department.Department;
+import com.suma.carepoint.entities.organization.Department;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

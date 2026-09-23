@@ -60,6 +60,7 @@ public class ApiConstant {
         public static final String ALPHANUMERIC_DASH_UNDERSCORE = "^[A-Za-z0-9_-]+$";
         public static final String ALPHA_ONLY = "^[A-Za-z]+$";
         public static final String NUMERIC_ONLY = "^[0-9]+$";
+        public static final String CONTACT_NUMBER = "^[0-9+() .-]*$";
 
     }
 
@@ -84,5 +85,29 @@ public class ApiConstant {
 
     }
 
+    public static final class Staff {
+        private Staff() {}
 
+        public static final String BASE = "/api/staff";
+        public static final String CREATE = "";
+        public static final String GET_BY_ID = "/{staffId}";
+        public static final String GET_ALL = "";
+        public static final String GET_ACTIVE = "/active";
+        public static final String GET_BY_DEPARTMENT = "/department";
+        public static final String GET_BY_DESIGNATION = "/designation";
+        public static final String UPDATE = "/{staffId}";
+        public static final String UPDATE_STATUS = "/{staffId}/status";
+        public static final String DELETE = "/{staffId}";
+    }
+
+    public static final class Visit {
+        private Visit() {}
+
+        public static final String BASE = "/api/visits";
+        public static final String CREATE = "";
+        public static final String GET_BY_ID = "/{visitId}";
+        public static final String GET_ALL = "";
+        public static final String UPDATE = "/{visitId}";
+        public static final String STATUS = "/{visitId}/status";
+    }
 }

@@ -1,8 +1,8 @@
-package com.suma.carepoint.services.department;
+package com.suma.carepoint.services.organization;
 
 
-import com.suma.carepoint.models.department.DepartmentRequest;
-import com.suma.carepoint.models.department.DepartmentResponse;
+import com.suma.carepoint.models.organization.DepartmentRequest;
+import com.suma.carepoint.models.organization.DepartmentResponse;
 import com.suma.carepoint.models.utility.PageResponse;
 
 public interface DepartmentService {

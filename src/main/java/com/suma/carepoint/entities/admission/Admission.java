@@ -1,6 +1,6 @@
 package com.suma.carepoint.entities.admission;
 import com.suma.carepoint.entities.base.BaseEntity;
-import com.suma.carepoint.entities.department.Staff;
+import com.suma.carepoint.entities.organization.Staff;
 import com.suma.carepoint.entities.patient.Patient;
 import com.suma.carepoint.models.admission.AdmissionStatus;
 import com.suma.carepoint.models.admission.AdmissionType;

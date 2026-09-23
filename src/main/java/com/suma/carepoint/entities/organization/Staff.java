@@ -1,6 +1,5 @@
-package com.suma.carepoint.entities.department;
+package com.suma.carepoint.entities.organization;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.suma.carepoint.entities.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -44,7 +43,6 @@ public class Staff extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "department_id", nullable = false)
-    @JsonIgnoreProperties("staff")
     private Department department;
 
     @Column(name = "joining_date")

@@ -1,9 +1,8 @@
-package com.suma.carepoint.models.department;
+package com.suma.carepoint.models.organization;
 
 import lombok.*;
 
 import java.time.Instant;
-import java.time.OffsetDateTime;
 
 @Getter
 @Setter

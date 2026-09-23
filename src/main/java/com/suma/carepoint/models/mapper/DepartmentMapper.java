@@ -1,8 +1,8 @@
 package com.suma.carepoint.models.mapper;
 
-import com.suma.carepoint.entities.department.Department;
-import com.suma.carepoint.models.department.DepartmentRequest;
-import com.suma.carepoint.models.department.DepartmentResponse;
+import com.suma.carepoint.entities.organization.Department;
+import com.suma.carepoint.models.organization.DepartmentRequest;
+import com.suma.carepoint.models.organization.DepartmentResponse;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;

@@ -2,11 +2,14 @@ package com.suma.carepoint.configs;
 
 import com.suma.carepoint.entities.bill.Bill;
 import com.suma.carepoint.entities.medical_service.HospitalService;
+import com.suma.carepoint.entities.organization.Staff;
 import com.suma.carepoint.entities.patient.Patient;
 import com.suma.carepoint.models.billing.BillResponse;
 import com.suma.carepoint.models.medical_service.CreateServiceRequest;
+import com.suma.carepoint.models.organization.StaffRequest;
 import com.suma.carepoint.models.patient.CreatePatientRequest;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 @Configuration
@@ -39,6 +42,11 @@ public class BeanConfig {
 //                        mapper.skip(BillResponse::setItems);
 //                        mapper.skip(BillResponse::setPayments);
 //                    });
+
+            modelMapper.typeMap(StaffRequest.class, Staff.class)
+                    .addMappings(mapper -> mapper.skip(Staff::setStaffId));
+            modelMapper.getConfiguration()
+                    .setMatchingStrategy(MatchingStrategies.STRICT);
 
             return modelMapper;
         }

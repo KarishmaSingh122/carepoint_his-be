@@ -2,10 +2,10 @@ package com.suma.carepoint.controllers;
 
 import com.suma.carepoint.models.ApiResponse;
 import com.suma.carepoint.models.constants.ApiConstant;
-import com.suma.carepoint.models.department.DepartmentRequest;
-import com.suma.carepoint.models.department.DepartmentResponse;
+import com.suma.carepoint.models.organization.DepartmentRequest;
+import com.suma.carepoint.models.organization.DepartmentResponse;
 import com.suma.carepoint.models.utility.PageResponse;
-import com.suma.carepoint.services.department.DepartmentService;
+import com.suma.carepoint.services.organization.DepartmentService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -26,23 +26,17 @@ public class DepartmentController {
 
     @PostMapping(ApiConstant.Department.CREATE)
     public ResponseEntity<ApiResponse> createDepartment(@Valid @RequestBody DepartmentRequest request) {
-
         log.info("Create department request received. departmentCode={}", request.getDepartmentCode());
-
         DepartmentResponse departmentResponse = departmentService.createDepartment(request);
-
         ApiResponse response = new ApiResponse(1, "", departmentResponse);
-
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping(ApiConstant.Department.GET_BY_ID)
-    public ResponseEntity<ApiResponse> getDepartmentById(@PathVariable @Min(value = 1, message = "Department ID must be positive") Long departmentId) {
-
+    public ResponseEntity<ApiResponse> getDepartmentById(
+            @PathVariable @Min(value = 1, message = "Department ID must be positive") Long departmentId) {
         DepartmentResponse departmentResponse = departmentService.getDepartmentById(departmentId);
-
         ApiResponse response = new ApiResponse(1, "", departmentResponse);
-
         return ResponseEntity.ok().body(response);
     }
 
@@ -52,11 +46,8 @@ public class DepartmentController {
             @RequestParam(required = false) Boolean active,
             @RequestParam(defaultValue = "0") @Min(value = 0, message = "Page must be greater than or equal to 0") int page,
             @RequestParam(defaultValue = "20") @Min(value = 1, message = "Size must be greater than 0") @Max(value = 100, message = "Size must not exceed 100") int size) {
-
         PageResponse departmentPageResponse = departmentService.getDepartments(search, active, page, size);
-
         ApiResponse response = new ApiResponse(1, "", departmentPageResponse);
-
         return ResponseEntity.ok().body(response);
     }
 
@@ -66,11 +57,8 @@ public class DepartmentController {
             @Min(value = 0, message = "Page must be greater than or equal to 0") int page,
             @RequestParam(defaultValue = "20") @Min(value = 1, message = "Size must be greater than 0")
             @Max(value = 100, message = "Size must not exceed 100") int size) {
-
         PageResponse departmentPageResponse = departmentService.getActiveDepartments(page, size);
-
         ApiResponse response = new ApiResponse(1, "", departmentPageResponse);
-
         return ResponseEntity.ok().body(response);
     }
 
@@ -81,7 +69,6 @@ public class DepartmentController {
 
         DepartmentResponse departmentResponse = departmentService.updateDepartment(departmentId, request);
         ApiResponse response = new ApiResponse(1, "", departmentResponse);
-
         return ResponseEntity.ok().body(response);
     }
 
@@ -89,7 +76,6 @@ public class DepartmentController {
     public ResponseEntity<ApiResponse> updateDepartmentStatus(
             @PathVariable @Min(value = 1, message = "Department ID must be positive") Long departmentId,
             @RequestParam boolean status) {
-
         DepartmentResponse departmentResponse = departmentService.updateDepartmentStatus(departmentId, status);
         ApiResponse response = new ApiResponse(1, "", departmentResponse);
         return ResponseEntity.ok().body(response);

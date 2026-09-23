@@ -1,4 +1,4 @@
-package com.suma.carepoint.models.department;
+package com.suma.carepoint.models.organization;
 
 import com.suma.carepoint.models.constants.ApiConstant;
 import jakarta.validation.constraints.NotBlank;
