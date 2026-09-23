@@ -135,4 +135,16 @@ public class ApiConstant {
         public static final String UPDATE = "/floor/update";
         public static final String DELETE = "/floor/delete";
     }
+
+
+    public static class Ward{
+        private Ward(){}
+        public static final String CREATE = "/ward/create";
+        public static final String GET_ALL = "/ward/get-all";
+        public static final String GET_BY_ID = "/ward/get-by-id";
+        public static final String UPDATE = "/ward/update";
+        public static final String DELETE = "/ward/delete";
+    }
+
+
 }
