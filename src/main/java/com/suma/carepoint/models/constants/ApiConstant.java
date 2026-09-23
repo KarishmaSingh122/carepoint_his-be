@@ -110,4 +110,13 @@ public class ApiConstant {
         public static final String UPDATE = "/{visitId}";
         public static final String STATUS = "/{visitId}/status";
     }
+
+    public static class Floor {
+        private Floor(){}
+        public static final String CREATE = "/floor/create";
+        public static final String GET_ALL = "/floor/get-all";
+        public static final String GET_BY_ID = "/floor/get-by-id";
+        public static final String UPDATE = "/floor/update";
+        public static final String DELETE = "/floor/delete";
+    }
 }
