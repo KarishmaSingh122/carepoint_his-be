@@ -1,7 +1,5 @@
 package com.suma.carepoint.services.visit;
 
-import com.suma.carepoint.entities.visit.VisitStatus;
-import com.suma.carepoint.entities.visit.VisitType;
 import com.suma.carepoint.models.utility.PageResponse;
 import com.suma.carepoint.models.visit.VisitRequest;
 import com.suma.carepoint.models.visit.VisitResponse;
@@ -12,22 +10,10 @@ public interface VisitService {
 
     VisitResponse getById(Long visitId);
 
-    PageResponse getAll(
-            Long patientId,
-            Long doctorId,
-            Long departmentId,
-            String status,
-            int page,
-            int size
-    );
+    PageResponse getAll(Long patientId, Long doctorId,
+                        Long departmentId, String status, int page, int size);
 
-    VisitResponse update(
-            Long visitId,
-            VisitRequest request
-    );
+    VisitResponse update(Long visitId, VisitRequest request);
 
-    VisitResponse updateStatus(
-            Long visitId,
-            String request
-    );
+    VisitResponse updateStatus(Long visitId, String request);
 }
