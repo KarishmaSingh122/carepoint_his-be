@@ -11,7 +11,8 @@ CREATE TABLE prescriptions
     prescription_date TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     notes             TEXT,
     active       BOOLEAN NOT NULL DEFAULT true,
-    created_at        TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at        TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX idx_prescriptions_patient_id ON prescriptions (patient_id);

@@ -1,11 +1,11 @@
 package com.suma.carepoint.configs;
 
-import com.suma.carepoint.entities.bill.Bill;
 import com.suma.carepoint.entities.medical_service.HospitalService;
+import com.suma.carepoint.entities.medication.Prescription;
 import com.suma.carepoint.entities.organization.Staff;
 import com.suma.carepoint.entities.patient.Patient;
-import com.suma.carepoint.models.billing.BillResponse;
 import com.suma.carepoint.models.medical_service.CreateServiceRequest;
+import com.suma.carepoint.models.medication.PrescriptionResponse;
 import com.suma.carepoint.models.organization.StaffRequest;
 import com.suma.carepoint.models.patient.CreatePatientRequest;
 import org.modelmapper.ModelMapper;
@@ -19,6 +19,9 @@ public class BeanConfig {
         public ModelMapper modelMapper() {
 
             ModelMapper modelMapper =  new ModelMapper();
+
+            modelMapper.getConfiguration()
+                    .setMatchingStrategy(MatchingStrategies.STRICT);
             // Only BillingDto -> Billing
             modelMapper.typeMap(CreatePatientRequest.class, Patient.class)
                     .addMappings(mapper -> {
@@ -32,16 +35,20 @@ public class BeanConfig {
                         mapper.skip(HospitalService::setServiceId);
                     });
 
-//            modelMapper.typeMap(Bill.class, BillResponse.class)
-//                    .addMappings(mapper -> {
-//                        mapper.skip(BillResponse::setPatientId);
-////                        mapper.skip(BillResponse::setVisitId);
-////                        mapper.skip(BillResponse::setAdmissionId);
-//                        mapper.skip(BillResponse::setPaidAmount);
-//                        mapper.skip(BillResponse::setBalanceAmount);
-//                        mapper.skip(BillResponse::setItems);
-//                        mapper.skip(BillResponse::setPayments);
-//                    });
+            //Prescription -> PrescriptionResponse
+            modelMapper.typeMap(
+                    Prescription.class,
+                    PrescriptionResponse.class
+            ).addMappings(mapper -> {
+
+                mapper.skip(PrescriptionResponse::setPatientId);
+
+//                mapper.skip(PrescriptionResponse::setDoctorId);
+//
+//                mapper.skip(PrescriptionResponse::setVisitId);
+
+                mapper.skip(PrescriptionResponse::setItems);
+            });
 
             modelMapper.typeMap(StaffRequest.class, Staff.class)
                     .addMappings(mapper -> mapper.skip(Staff::setStaffId));

@@ -11,7 +11,8 @@ CREATE TABLE prescription_items
     frequency            VARCHAR(100),
     duration             VARCHAR(100),
     instructions         TEXT,
-    created_at           TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at           TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX idx_prescription_items_prescription_id ON prescription_items (prescription_id);

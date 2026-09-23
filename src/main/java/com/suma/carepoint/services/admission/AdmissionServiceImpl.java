@@ -1,4 +1,5 @@
     package com.suma.carepoint.services.admission;
+
     import com.suma.carepoint.entities.admission.Admission;
     import com.suma.carepoint.entities.patient.Patient;
     import com.suma.carepoint.models.ApiResponse;
@@ -9,6 +10,7 @@
     import lombok.extern.slf4j.Slf4j;
     import org.modelmapper.ModelMapper;
     import org.springframework.stereotype.Service;
+
     import java.util.List;
 
     @Slf4j

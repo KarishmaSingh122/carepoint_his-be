@@ -13,6 +13,8 @@ public class ApiConstant {
          public static final String HMIS = "api/hmis";
          public static final String BILL = "api/billing";
          public static final String HOSPITAL_SERVICE = "api/services";
+        public static final String MEDICATION = "api/medication";
+
 
 
 
@@ -99,6 +101,20 @@ public class ApiConstant {
         public static final String UPDATE_STATUS = "/{staffId}/status";
         public static final String DELETE = "/{staffId}";
     }
+
+    public static class Medication{
+        private Medication(){}
+
+        public static final String MEDICATIONS = "/medications";
+
+        public static final String PRESCRIPTION = "/prescription";
+        public static final String PATIENT_PRESCRIPTIONS = "/prescription/patient";
+        public static final String VISIT_PRESCRIPTIONS = "/prescription/visit";
+        public static final String DOCTOR_PRESCRIPTIONS = "/prescription/doctor";
+
+
+    }
+
 
     public static final class Visit {
         private Visit() {}

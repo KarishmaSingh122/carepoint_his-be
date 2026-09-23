@@ -4,8 +4,6 @@ import com.suma.carepoint.models.ApiResponse;
 import com.suma.carepoint.models.admission.CreateAdmissionRequest;
 import com.suma.carepoint.models.constants.ApiConstant;
 import com.suma.carepoint.services.admission.AdmissionService;
-import com.suma.carepoint.services.admission.AdmissionServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 
