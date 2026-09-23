@@ -74,5 +74,15 @@ public class ApiConstant {
 
     }
 
+    public static class Admission{
+        private Admission (){}
+        public static final String CREATE = "/create";
+        public static final String GET_BY_ID = "/get-by-id";
+        public static final String GET_ALL = "/get-all";
+        public static final String DELETE = "/delete";
+        public static final String UPDATE = "/update";
+
+    }
+
 
 }
