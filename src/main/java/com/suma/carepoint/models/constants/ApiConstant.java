@@ -15,7 +15,7 @@ public class ApiConstant {
          public static final String HOSPITAL_SERVICE = "api/services";
         public static final String MEDICATION = "api/medication";
         public static final String PROCEDURE = "api/procedure";
-
+        public static final String DIAGNOSIS="api/diagnosis";
 
 
 
@@ -161,4 +161,10 @@ public class ApiConstant {
         public static final String PROCEDURE_TREATMENTS ="/treatment/procedure";
 
     }
+
+    public static class Diagnosis{
+        private Diagnosis(){}
+        public static final String DIAGNOSIS ="/diagnosis";
+    }
+
 }
