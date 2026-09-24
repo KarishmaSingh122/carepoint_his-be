@@ -14,6 +14,8 @@ public class ApiConstant {
          public static final String BILL = "api/billing";
          public static final String HOSPITAL_SERVICE = "api/services";
         public static final String MEDICATION = "api/medication";
+        public static final String PROCEDURE = "api/procedure";
+
 
 
 
@@ -147,4 +149,16 @@ public class ApiConstant {
     }
 
 
+
+    public static class Procedure{
+        private Procedure(){}
+
+        public static final String PROCEDURE = "/procedure";
+        public static final String TREATMENT = "/treatment";
+        public static final String PATIENT_TREATMENT = "/treatment/patient";
+        public static final String ADMISSION_TREATMENTS ="/treatment/admission";
+        public static final String DOCTOR_TREATMENTS ="/treatment/doctor";
+        public static final String PROCEDURE_TREATMENTS ="/treatment/procedure";
+
+    }
 }

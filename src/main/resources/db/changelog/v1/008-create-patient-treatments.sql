@@ -10,7 +10,9 @@ CREATE TABLE patient_treatments
     treatment_date TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     description    TEXT,
     remarks        TEXT,
-    created_at     TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at     TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at     TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP
+
 );
 
 CREATE INDEX idx_treatments_admission_id ON patient_treatments (admission_id);
