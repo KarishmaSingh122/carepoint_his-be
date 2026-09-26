@@ -16,10 +16,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import static com.suma.carepoint.models.utility.PageResponse.buildPageResponse;
 import static com.suma.carepoint.models.utility.PageResponse.validatePagination;
+import static com.suma.carepoint.models.utility.TextNormalizationUtils.normalize;
+import static com.suma.carepoint.models.utility.TextNormalizationUtils.normalizeSearch;
 
 @Service
 @RequiredArgsConstructor
@@ -136,20 +137,6 @@ public class DepartmentServiceImpl implements DepartmentService {
         if (nameExists) {
             throw new ConflictException("Department name already exists");
         }
-    }
-
-    private String normalize(String value) {
-        if (value == null) {
-            return null;
-        }
-        return value.trim();
-    }
-
-    private String normalizeSearch(String search) {
-        if (!StringUtils.hasText(search)) {
-            return null;
-        }
-        return search.trim();
     }
 
 }

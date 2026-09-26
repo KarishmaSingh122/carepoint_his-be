@@ -167,4 +167,15 @@ public class ApiConstant {
         public static final String DIAGNOSIS ="/diagnosis";
     }
 
+    public static final class MedicalRecord {
+        private MedicalRecord() {}
+
+        public static final String BASE = "/api/medical-records";
+        public static final String CREATE = "";
+        public static final String GET_BY_ID = "/{medicalRecordId}";
+        public static final String GET_ALL = "";
+        public static final String UPDATE = "/{medicalRecordId}";
+        public static final String DELETE = "/{medicalRecordId}";
+    }
+
 }

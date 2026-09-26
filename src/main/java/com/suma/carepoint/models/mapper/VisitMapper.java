@@ -15,53 +15,30 @@ public class VisitMapper {
     private final ModelMapper modelMapper;
 
     public VisitResponse toResponse(Visit visit) {
-        VisitResponse response =
-                modelMapper.map(
-                        visit,
-                        VisitResponse.class
-                );
+        VisitResponse response = modelMapper.map(visit, VisitResponse.class);
 
         if (visit.getPatient() != null) {
-            response.setPatientId(
-                    visit.getPatient().getPatientId()
-            );
+            response.setPatientId(visit.getPatient().getPatientId());
         }
 
         if (visit.getDoctor() != null) {
-            response.setDoctorId(
-                    visit.getDoctor().getStaffId()
-            );
-            response.setDoctorEmployeeNo(
-                    visit.getDoctor().getEmployeeNo()
-            );
-            response.setDoctorFirstName(
-                    visit.getDoctor().getFirstName()
-            );
-            response.setDoctorLastName(
-                    visit.getDoctor().getLastName()
-            );
+            response.setDoctorId(visit.getDoctor().getStaffId());
+            response.setDoctorEmployeeNo(visit.getDoctor().getEmployeeNo());
+            response.setDoctorFirstName(visit.getDoctor().getFirstName());
+            response.setDoctorLastName(visit.getDoctor().getLastName());
         }
 
         if (visit.getDepartment() != null) {
-            response.setDepartmentId(
-                    visit.getDepartment().getDepartmentId()
-            );
-            response.setDepartmentCode(
-                    visit.getDepartment().getDepartmentCode()
-            );
-            response.setDepartmentName(
-                    visit.getDepartment().getDepartmentName()
-            );
+            response.setDepartmentId(visit.getDepartment().getDepartmentId());
+            response.setDepartmentCode(visit.getDepartment().getDepartmentCode());
+            response.setDepartmentName(visit.getDepartment().getDepartmentName());
         }
 
         return response;
     }
 
     public Visit toEntity(VisitRequest request) {
-        Visit visit = modelMapper.map(
-                request,
-                Visit.class
-        );
+        Visit visit = modelMapper.map(request, Visit.class);
 
         visit.setPatient(null);
         visit.setDoctor(null);

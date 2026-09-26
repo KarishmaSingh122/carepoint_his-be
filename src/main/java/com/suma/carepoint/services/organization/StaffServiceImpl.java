@@ -22,6 +22,8 @@ import org.springframework.util.StringUtils;
 
 import static com.suma.carepoint.models.utility.PageResponse.buildPageResponse;
 import static com.suma.carepoint.models.utility.PageResponse.validatePagination;
+import static com.suma.carepoint.models.utility.TextNormalizationUtils.normalize;
+import static com.suma.carepoint.models.utility.TextNormalizationUtils.normalizeSearch;
 
 @Service
 @RequiredArgsConstructor
@@ -29,9 +31,7 @@ import static com.suma.carepoint.models.utility.PageResponse.validatePagination;
 public class StaffServiceImpl implements StaffService {
 
     private final StaffRepository staffRepository;
-
     private final DepartmentRepository departmentRepository;
-
     private final StaffMapper staffMapper;
 
     @Override
@@ -208,14 +208,6 @@ public class StaffServiceImpl implements StaffService {
         }
     }
 
-    private String normalize(String value) {
-        if (value == null) {
-            return null;
-        }
-        String normalized = value.trim();
-        return normalized.isEmpty() ? null : normalized;
-    }
-
     private String normalizeEmail(String email) {
         String normalized = normalize(email);
         if (normalized == null) {
@@ -224,10 +216,4 @@ public class StaffServiceImpl implements StaffService {
         return normalized.toLowerCase();
     }
 
-    private String normalizeSearch(String search) {
-        if (!StringUtils.hasText(search)) {
-            return null;
-        }
-        return search.trim();
-    }
 }
