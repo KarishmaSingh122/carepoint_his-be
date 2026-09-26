@@ -3,7 +3,6 @@ package com.suma.carepoint.services.emr;
 import com.suma.carepoint.models.ApiResponse;
 import com.suma.carepoint.models.emr.DiagnosisRequest;
 import jakarta.validation.Valid;
-import org.jspecify.annotations.Nullable;
 
 public interface DiagnosisService {
      ApiResponse createDiagnosis(@Valid DiagnosisRequest request);
@@ -18,5 +17,5 @@ public interface DiagnosisService {
 
      ApiResponse deleteDiagnosis(Long diagnosisId);
 
-     ApiResponse searchDiagnosises(String keyword);
+     ApiResponse searchDiagnoses(String keyword);
 }

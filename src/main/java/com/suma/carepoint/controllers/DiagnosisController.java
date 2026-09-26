@@ -20,7 +20,7 @@ public class DiagnosisController {
 
     //apis related to procedures
 
-    @PostMapping(ApiConstant.Diagnosis.DIAGNOSIS)
+    @PostMapping
     public ResponseEntity<ApiResponse> createDiagnosis(@Valid @RequestBody DiagnosisRequest request) {
         return ResponseEntity.ok().body(diagnosisService.createDiagnosis(request));
     }
@@ -31,10 +31,7 @@ public class DiagnosisController {
     }
 
 
-    /**
-     * Get Procedure By ID
-     */
-    @GetMapping(ApiConstant.Diagnosis.DIAGNOSIS + "/{diagnosisId}")
+    @GetMapping("/{diagnosisId}")
     public ResponseEntity<ApiResponse> getDiagnosisById(
             @PathVariable("diagnosisId") Long diagnosisId) {
 
@@ -42,26 +39,14 @@ public class DiagnosisController {
                 .body(diagnosisService.getDiagnosisById(diagnosisId));
     }
 
-
-    /**
-     * Update Procedure
-     * PUT /api/procedures/{diagnosisId}
-     */
-    @PutMapping(ApiConstant.Diagnosis.DIAGNOSIS + "/{diagnosisId}")
+    @PutMapping("/{diagnosisId}")
     public ResponseEntity<ApiResponse> updateDiagnosis(
             @PathVariable("diagnosisId") Long diagnosisId,
             @Valid @RequestBody DiagnosisRequest request) {
         return ResponseEntity.ok().body(diagnosisService.updateDiagnosis(diagnosisId, request));
     }
 
-
-    /**
-     * Activate / Deactivate Procedure
-     */
-    @PatchMapping(
-            ApiConstant.Diagnosis.DIAGNOSIS
-                    + "/{diagnosisId}/status"
-    )
+    @PatchMapping("/{diagnosisId}/status")
     public ResponseEntity<ApiResponse> updateDiagnosisStatus(
             @PathVariable("diagnosisId") Long diagnosisId,
             @RequestParam("active") Boolean active) {
@@ -72,29 +57,18 @@ public class DiagnosisController {
                 ));
     }
 
-
-    /**
-     * Delete Procedure
-     */
-    @DeleteMapping(
-            ApiConstant.Diagnosis.DIAGNOSIS
-                    + "/{diagnosisId}"
-    )
+    @DeleteMapping("/{diagnosisId}")
     public ResponseEntity<ApiResponse> deleteDiagnosis(
             @PathVariable("diagnosisId") Long diagnosisId) {
 
         return ResponseEntity.ok().body(diagnosisService.deleteDiagnosis(diagnosisId));
     }
 
-
-    /**
-     * Search Procedures
-     */
-    @GetMapping(ApiConstant.Diagnosis.DIAGNOSIS + "/search")
-    public ResponseEntity<ApiResponse> searchDiagnosises(
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse> searchDiagnoses(
             @RequestParam("keyword") String keyword) {
 
-        return ResponseEntity.ok().body(diagnosisService.searchDiagnosises(keyword));
+        return ResponseEntity.ok().body(diagnosisService.searchDiagnoses(keyword));
     }
 
 

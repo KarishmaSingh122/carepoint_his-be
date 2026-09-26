@@ -411,51 +411,24 @@ public class DiagnosisServiceImpl implements DiagnosisService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public ApiResponse searchDiagnosises(String keyword) {
+    public ApiResponse searchDiagnoses(String keyword) {
 
         try {
-
             if (keyword == null || keyword.trim().isEmpty()) {
-                return new ApiResponse(
-                        2,
-                        "Search keyword cannot be empty",
-                        null
-                );
+                return new ApiResponse(2, "Search keyword cannot be empty", null);
             }
 
             String searchKeyword = keyword.trim();
-
-            List<Diagnosis> diagnoses =
-                    diagnosisRepository.searchActiveDiagnoses(
-                            searchKeyword
-                    );
-
+            List<Diagnosis> diagnoses = diagnosisRepository.searchActiveDiagnoses(searchKeyword);
             List<DiagnosisResponse> responses = diagnoses
                     .stream()
                     .map(this::buildDiagnosisResponse)
                     .toList();
-
-            return new ApiResponse(
-                    1,
-                    "Diagnoses searched successfully",
-                    responses,
-                    (long) responses.size()
-            );
+            return new ApiResponse(1, "Diagnoses searched successfully", responses, (long) responses.size());
 
         } catch (Exception e) {
-
-            log.error(
-                    "Error while searching diagnoses with keyword: {}",
-                    keyword,
-                    e
-            );
-
-            return new ApiResponse(
-                    2,
-                    "Failed to search diagnoses",
-                    null
-            );
+            log.error("Error while searching diagnoses with keyword: {}", keyword, e);
+            return new ApiResponse(2, "Failed to search diagnoses", null);
         }
     }
 

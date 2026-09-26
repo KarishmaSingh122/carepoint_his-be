@@ -4,6 +4,8 @@ import com.suma.carepoint.entities.emr.Diagnosis;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -18,5 +20,13 @@ public interface DiagnosisRepository extends JpaRepository<Diagnosis,Long> {
 
     boolean existsByDiagnosisCodeIgnoreCaseAndDiagnosisIdNot(@NotBlank(message = "Diagnosis code is required") @Size(max = 30, message = "Diagnosis code must not exceed 30 characters") String diagnosisCode, Long diagnosisId);
 
-    List<Diagnosis> searchActiveDiagnoses(String searchKeyword);
+    @Query("""
+        SELECT d FROM Diagnosis d WHERE d.active = true 
+        AND (
+            LOWER(d.diagnosisCode) LIKE LOWER(CONCAT('%', :searchKeyword, '%')) 
+            OR LOWER(d.diagnosisName) LIKE LOWER(CONCAT('%', :searchKeyword, '%'))
+        )
+    """)
+    List<Diagnosis> searchActiveDiagnoses(@Param("searchKeyword") String searchKeyword);
+
 }
