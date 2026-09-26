@@ -1,14 +1,17 @@
 package com.suma.carepoint.configs;
 
+import com.suma.carepoint.entities.document.Document;
 import com.suma.carepoint.entities.medical_service.HospitalService;
 import com.suma.carepoint.entities.medication.Prescription;
 import com.suma.carepoint.entities.organization.Staff;
 import com.suma.carepoint.entities.patient.Patient;
+import com.suma.carepoint.models.document.DocumentResponse;
 import com.suma.carepoint.models.medical_service.CreateServiceRequest;
 import com.suma.carepoint.models.medication.PrescriptionResponse;
 import com.suma.carepoint.models.organization.StaffRequest;
 import com.suma.carepoint.models.patient.CreatePatientRequest;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeMap;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -55,6 +58,15 @@ public class BeanConfig {
             modelMapper.getConfiguration()
                     .setMatchingStrategy(MatchingStrategies.STRICT);
 
+            TypeMap<Document, DocumentResponse> documentTypeMap =
+                    modelMapper.createTypeMap(Document.class, DocumentResponse.class);
+
+            documentTypeMap.addMappings(mapper -> {
+                mapper.skip(DocumentResponse::setPatientId);
+                mapper.skip(DocumentResponse::setVisitId);
+                mapper.skip(DocumentResponse::setAdmissionId);
+                mapper.skip(DocumentResponse::setUploadedBy);
+            });
             return modelMapper;
         }
 

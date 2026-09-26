@@ -17,7 +17,7 @@ CREATE TABLE documents
     stored_file_name VARCHAR(255)  NOT NULL,
     created_at       TIMESTAMPTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     uploaded_at      TIMESTAMPTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    is_verified       BOOLEAN NOT NULL DEFAULT true
+    verified         BOOLEAN NOT NULL DEFAULT true
 );
 
 CREATE INDEX idx_documents_patient_id ON documents (patient_id);
@@ -25,6 +25,6 @@ CREATE INDEX idx_documents_visit_id ON documents (visit_id);
 CREATE INDEX idx_documents_admission_id ON documents (admission_id);
 CREATE INDEX idx_documents_uploaded_by ON documents (uploaded_by);
 CREATE INDEX idx_documents_type ON documents (document_type);
-CREATE INDEX idx_documents_is_verified ON documents (is_verified);
+CREATE INDEX idx_documents_verified ON documents (verified);
 
 --rollback DROP TABLE documents;

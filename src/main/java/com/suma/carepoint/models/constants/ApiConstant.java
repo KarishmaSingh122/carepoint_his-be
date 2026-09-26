@@ -178,4 +178,78 @@ public class ApiConstant {
         public static final String DELETE = "/{medicalRecordId}";
     }
 
+    public static final class Document {
+        private Document() {}
+
+        public static final String BASE = "/api/documents";
+        public static final String UPLOAD = "";
+        public static final String BULK_UPLOADS = "/files";
+        public static final String GET_BY_ID = "/{documentId}";
+        public static final String GET_ALL = "";
+        public static final String DOWNLOAD = "/{documentId}/download";
+        public static final String VERIFICATION = "/{documentId}/verification";
+        public static final String DELETE = "/{documentId}";
+
+        public static final long MAX_SINGLE_FILE_SIZE = 20 * 1024 * 1024L;
+        public static final long MAX_TOTAL_FILES_SIZE = 100 * 1024 * 1024L;
+        public static final String ROOT_FOLDER = "C:/hmis/storage/patient-documents";
+    }
+
+    public static final class User {
+        private User() {}
+
+        public static final String BASE = "/api/users";
+        public static final String CREATE = "";
+        public static final String GET_BY_ID = "/{userId}";
+        public static final String GET_ALL = "";
+        public static final String GET_BY_STAFF = "/staff/{staffId}";
+        public static final String UPDATE = "/{userId}";
+        public static final String STATUS = "/{userId}/status";
+        public static final String DELETE = "/{userId}";
+    }
+
+    public static final class Role {
+        private Role() {}
+
+        public static final String BASE = "/api/roles";
+        public static final String CREATE = "";
+        public static final String GET_BY_ID = "/{roleId}";
+        public static final String GET_ALL = "";
+        public static final String UPDATE = "/{roleId}";
+        public static final String STATUS = "/{roleId}/status";
+        public static final String DELETE = "/{roleId}";
+    }
+
+    public static final class UserRole {
+        private UserRole() {}
+
+        public static final String BASE = "/api/user-roles";
+        public static final String ASSIGN = "";
+        public static final String GET_BY_USER = "/{userId}";
+        public static final String GET_BY_USER_AND_ROLE = "/{userId}/{roleId}";
+        public static final String GET_BY_ROLE = "/role/{roleId}";
+        public static final String REMOVE = "/{userId}/{roleId}";
+    }
+
+    public static final class Permission {
+        private Permission() {}
+
+        public static final String BASE = "/api/permissions";
+        public static final String CREATE = "";
+        public static final String GET_BY_ID = "/{permissionId}";
+        public static final String GET_ALL = "";
+        public static final String UPDATE = "/{permissionId}";
+        public static final String DELETE = "/{permissionId}";
+    }
+
+    public static final class RolePermission {
+        private RolePermission() {}
+
+        public static final String BASE = "/api/role-permissions";
+        public static final String ASSIGN = "";
+        public static final String GET_BY_ROLE = "/{roleId}";
+        public static final String GET_BY_ROLE_AND_PERMISSION = "/{roleId}/{permissionId}";
+        public static final String GET_BY_PERMISSION = "/permission/{permissionId}";
+        public static final String REMOVE = "/{roleId}/{permissionId}";
+    }
 }
