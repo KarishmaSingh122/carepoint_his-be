@@ -252,4 +252,77 @@ public class ApiConstant {
         public static final String GET_BY_PERMISSION = "/permission/{permissionId}";
         public static final String REMOVE = "/{roleId}/{permissionId}";
     }
+
+ public static class WardRoom {
+        private WardRoom() {
+        }
+
+        public static final String CREATE = "/wardroom/create";
+        public static final String GET_ALL = "/wardroom/get-all";
+        public static final String GET_BY_ID = "/wardroom/get-by-id";
+        public static final String UPDATE = "/wardroom/update";
+        public static final String DELETE = "/wardroom/delete";
+    }
+
+
+    public static class Bed {
+        private Bed() {
+        }
+
+        public static final String CREATE = "/bed/create";
+        public static final String GET_ALL = "/bed/get-all";
+        public static final String GET_BY_ID = "/bed/get-by-id/{bedId}";
+        public static final String UPDATE = "/bed/update/{bedId}";
+        public static final String DELETE = "/bed/delete/{bedId}";
+    }
+
+    public static class BedAssignment {
+
+        private BedAssignment() {
+        }
+
+        public static final String CREATE = "/bed-assignment/create";
+
+        public static final String GET_ALL = "/bed-assignment/get-all";
+
+        public static final String GET_BY_ID = "/bed-assignment/get-by-id/{assignmentId}";
+
+        public static final String UPDATE = "/bed-assignment/update/{assignmentId}";
+
+        public static final String RELEASE = "/bed-assignment/release/{assignmentId}";
+
+        public static final String DELETE = "/bed-assignment/delete/{assignmentId}";
+    }
+
+    public static class Discharge {
+
+        private Discharge() {
+        }
+
+        public static final String CREATE = "/discharge/create";
+
+        public static final String GET_ALL = "/discharge/get-all";
+
+        public static final String GET_BY_ID = "/discharge/get-by-id/{dischargeId}";
+
+        public static final String UPDATE = "/discharge/update/{dischargeId}";
+
+        public static final String DELETE = "/discharge/delete/{dischargeId}";
+    }
+
+    public static class Allergy {
+
+        private Allergy() {
+        }
+
+        public static final String CREATE = "/allergy/create";
+
+        public static final String GET_ALL = "/allergy/get-all";
+
+        public static final String GET_BY_ID = "/allergy/get-by-id/{allergyId}";
+
+        public static final String UPDATE = "/allergy/update/{allergyId}";
+
+        public static final String DELETE = "/allergy/delete/{allergyId}";
+    }
 }
