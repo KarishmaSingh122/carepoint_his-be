@@ -106,29 +106,53 @@ public class WardServiceImpl implements WardService{
 
     @Override
     public ApiResponse getAllWards() {
-
         try {
+
             List<Ward> wards = wardRepository.findAll();
-            return new ApiResponse(1, "", wards, (long) wards.size());
+
+            List<WardResponse> responses = wards.stream()
+                    .map(ward -> {
+                        WardResponse response = new WardResponse();
+
+                        response.setWardId(ward.getWardId());
+
+                        response.setDepartmentId(ward.getDepartment() != null ? ward.getDepartment().getDepartmentId() : null);
+
+                        response.setFloorId(ward.getFloor() != null ? ward.getFloor().getFloorId() : null);
+
+                        response.setWardName(ward.getWardName());
+                        response.setWardType(ward.getWardType());
+                        response.setActive(ward.getActive());
+                        return response;
+                    }).toList();
+
+            return new ApiResponse(1,
+                    "",
+                    responses,
+                    (long) responses.size()
+            );
 
         } catch (Exception e) {
+
             log.error("Error occurred while getting all wards", e);
             return new ApiResponse(2, "", null);
         }
     }
+
 
     @Override
     public ApiResponse updateWard(Long wardId, CreateWardRequest request) {
 
         try {
 
-            Ward ward = wardRepository.findById(wardId).orElseThrow(() -> new RuntimeException("Ward not found"));
+            Ward ward = wardRepository.findById(wardId)
+                    .orElseThrow(() -> new RuntimeException("Ward not found"));
 
-            Department department = departmentRepository.findById(request.getDepartmentId()).orElseThrow(() ->
-                            new RuntimeException("Department not found"));
+            Department department = departmentRepository.findById(request.getDepartmentId())
+                    .orElseThrow(() -> new RuntimeException("Department not found"));
 
-            Floor floor = floorRepository.findById(request.getFloorId()).orElseThrow(() ->
-                            new RuntimeException("Floor not found"));
+            Floor floor = floorRepository.findById(request.getFloorId())
+                    .orElseThrow(() -> new RuntimeException("Floor not found"));
 
             ward.setDepartment(department);
             ward.setFloor(floor);
@@ -140,7 +164,26 @@ public class WardServiceImpl implements WardService{
             }
 
             Ward updatedWard = wardRepository.save(ward);
-            return new ApiResponse(1, "", updatedWard);
+
+            WardResponse response = new WardResponse();
+
+            response.setWardId(updatedWard.getWardId());
+
+            response.setDepartmentId(
+                    updatedWard.getDepartment() != null
+                            ? updatedWard.getDepartment().getDepartmentId()
+                            : null);
+
+            response.setFloorId(
+                    updatedWard.getFloor() != null
+                            ? updatedWard.getFloor().getFloorId()
+                            : null);
+
+            response.setWardName(updatedWard.getWardName());
+            response.setWardType(updatedWard.getWardType());
+            response.setActive(updatedWard.getActive());
+
+            return new ApiResponse(1, "", response);
 
         } catch (Exception e) {
 
