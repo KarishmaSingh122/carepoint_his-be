@@ -5,6 +5,7 @@ import com.suma.carepoint.entities.organization.Department;
 import com.suma.carepoint.entities.ward.Ward;
 import com.suma.carepoint.models.ApiResponse;
 import com.suma.carepoint.models.ward.CreateWardRequest;
+import com.suma.carepoint.models.ward.WardResponse;
 import com.suma.carepoint.repositories.floor.FloorRepository;
 import com.suma.carepoint.repositories.organization.DepartmentRepository;
 import com.suma.carepoint.repositories.ward.WardRepository;
@@ -29,24 +30,44 @@ public class WardServiceImpl implements WardService{
 
     @Override
     public ApiResponse createWard(CreateWardRequest request) {
-
         try {
 
             Department department = departmentRepository.findById(request.getDepartmentId())
                     .orElseThrow(() -> new RuntimeException("Department not found"));
+
             Floor floor = floorRepository.findById(request.getFloorId())
                     .orElseThrow(() -> new RuntimeException("Floor not found"));
+
             Ward ward = new Ward();
+
             ward.setDepartment(department);
             ward.setFloor(floor);
             ward.setWardName(request.getWardName());
             ward.setWardType(request.getWardType());
             ward.setActive(request.getActive() != null ? request.getActive() : true);
-            Ward savedWard = wardRepository.save(ward);
-            return new ApiResponse(1, "", savedWard);
 
-        }
-        catch (Exception e) {
+            Ward savedWard = wardRepository.save(ward);
+
+            WardResponse response = new WardResponse();
+
+            response.setWardId(savedWard.getWardId());
+            response.setDepartmentId(
+                    savedWard.getDepartment() != null
+                            ? savedWard.getDepartment().getDepartmentId()
+                            : null
+            );
+            response.setFloorId(
+                    savedWard.getFloor() != null
+                            ? savedWard.getFloor().getFloorId()
+                            : null
+            );
+            response.setWardName(savedWard.getWardName());
+            response.setWardType(savedWard.getWardType());
+            response.setActive(savedWard.getActive());
+
+            return new ApiResponse(1, "", response);
+
+        } catch (Exception e) {
             log.error("Error occurred while creating ward", e);
             return new ApiResponse(2, "", null);
         }
@@ -56,10 +77,23 @@ public class WardServiceImpl implements WardService{
 
     @Override
     public ApiResponse getWardById(Long wardId) {
-
         try {
-            Ward ward = wardRepository.findById(wardId).orElseThrow(() -> new RuntimeException("Ward not found"));
-            return new ApiResponse(1, "", ward);
+            Ward ward = wardRepository.findById(wardId)
+                    .orElseThrow(() -> new RuntimeException("Ward not found"));
+
+            WardResponse response = new WardResponse();
+
+            response.setWardId(ward.getWardId());
+            response.setDepartmentId(ward.getDepartment() != null
+                            ? ward.getDepartment().getDepartmentId() : null);
+            response.setFloorId(ward.getFloor() != null
+                            ? ward.getFloor().getFloorId()
+                            : null);
+            response.setWardName(ward.getWardName());
+            response.setWardType(ward.getWardType());
+            response.setActive(ward.getActive());
+
+            return new ApiResponse(1, "", response);
 
         }
         catch (Exception e) {
@@ -67,6 +101,7 @@ public class WardServiceImpl implements WardService{
             return new ApiResponse(2, "", null);
         }
     }
+
 
 
     @Override
