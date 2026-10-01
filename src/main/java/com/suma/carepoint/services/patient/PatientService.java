@@ -2,6 +2,7 @@ package com.suma.carepoint.services.patient;
 
 import com.suma.carepoint.models.ApiResponse;
 import com.suma.carepoint.models.patient.CreatePatientRequest;
+import com.suma.carepoint.models.utility.PageResponse;
 import org.jspecify.annotations.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,4 +20,6 @@ public interface PatientService {
      ApiResponse DeletePatientByPatientId(Long patientId);
 
      ApiResponse searchPatientByKeyword(String keyword);
+
+     PageResponse getAllPatients(Boolean active, int page, int size);
 }

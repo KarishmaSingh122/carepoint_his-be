@@ -3,7 +3,10 @@ package com.suma.carepoint.controllers;
 import com.suma.carepoint.models.ApiResponse;
 import com.suma.carepoint.models.constants.ApiConstant;
 import com.suma.carepoint.models.patient.CreatePatientRequest;
+import com.suma.carepoint.models.utility.PageResponse;
 import com.suma.carepoint.services.patient.PatientService;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -66,4 +69,14 @@ public class PatientController {
         return ResponseEntity.ok().body(patientService.DeletePatientByPatientId(patientId));
     }
 
+    @GetMapping(ApiConstant.Patient.GET)
+    public ResponseEntity<ApiResponse> getAllPatients(
+            @RequestParam(required = false) Boolean active,
+            @RequestParam(defaultValue = "0") @Min(0) int page,
+            @RequestParam(defaultValue = "20") @Min(1) @Max(100) int size) {
+
+        PageResponse response = patientService.getAllPatients(active, page, size);
+        ApiResponse apiResponse = new ApiResponse(1, "", response);
+        return ResponseEntity.ok().body(apiResponse);
+    }
 }

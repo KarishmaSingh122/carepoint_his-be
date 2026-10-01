@@ -4,15 +4,24 @@ import com.suma.carepoint.entities.patient.Patient;
 import com.suma.carepoint.models.ApiResponse;
 import com.suma.carepoint.models.patient.CreatePatientRequest;
 import com.suma.carepoint.models.patient.PatientResponse;
+import com.suma.carepoint.models.utility.PageResponse;
 import com.suma.carepoint.repositories.patient.PatientRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import static com.suma.carepoint.models.utility.PageResponse.buildPageResponse;
+import static com.suma.carepoint.models.utility.PageResponse.validatePagination;
 
 @Slf4j
 @Service
@@ -174,5 +183,23 @@ public class PatientServiceImpl implements PatientService{
                     null
             );
         }
+    }
+
+    @Override
+    public PageResponse getAllPatients(Boolean active, int page, int size) {
+
+        validatePagination(page, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Page<Patient> patients;
+        if (active != null) {
+            patients = patientRepository.findByActive(active, pageable);
+        } else {
+            patients = patientRepository.findAll(pageable);
+        }
+
+        return buildPageResponse(patients, patients.getContent()
+                .stream().map(p->modelMapper.map(p, PatientResponse.class))
+                .collect(Collectors.toList()));
     }
 }

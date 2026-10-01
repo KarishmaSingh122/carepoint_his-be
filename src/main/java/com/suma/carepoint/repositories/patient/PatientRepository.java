@@ -1,6 +1,8 @@
 package com.suma.carepoint.repositories.patient;
 
 import com.suma.carepoint.entities.patient.Patient;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -25,4 +27,6 @@ public interface PatientRepository  extends JpaRepository<Patient,Long> {
         ORDER BY p.firstName ASC, p.lastName ASC
     """)
     List<Patient> searchByKeyword(@Param("keyword") String keyword);
+
+    Page<Patient> findByActive(boolean active, Pageable pageable);
 }
