@@ -29,6 +29,16 @@ public class BedController {
         return ResponseEntity.ok(bedService.getAllBeds());
     }
 
+    @GetMapping(ApiConstant.Bed.GET_ALL_BY_ROOM_ID+"/{roomId}")
+    public ResponseEntity<ApiResponse> getAllBedsByRoomId(@PathVariable Long roomId) {
+        return ResponseEntity.ok(bedService.getAllBedsByRoomId(roomId));
+    }
+
+    @GetMapping(ApiConstant.Bed.GET_AVAILABLE_BEDS_BY_ROOM_ID+"/{roomId}")
+    public ResponseEntity<ApiResponse> getAllAvailableBedsByRoomId(@PathVariable Long roomId) {
+        return ResponseEntity.ok(bedService.getAllAvailableBedsByRoomId(roomId));
+    }
+
     @PutMapping(ApiConstant.Bed.UPDATE)
     public ResponseEntity<ApiResponse> updateBed(@PathVariable Long bedId, @RequestBody CreateBedRequest createBedRequest) {
         return ResponseEntity.ok(bedService.updateBed(bedId, createBedRequest));

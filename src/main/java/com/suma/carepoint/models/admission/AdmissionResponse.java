@@ -17,6 +17,10 @@ public class AdmissionResponse {
 
     private String admissionNumber;
 
+    private String patientName;
+
+    private String admittingDoctorName;
+
     private Long patientId;
 
     private OffsetDateTime admissionDate;

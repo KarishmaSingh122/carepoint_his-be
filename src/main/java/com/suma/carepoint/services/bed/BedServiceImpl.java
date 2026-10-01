@@ -112,5 +112,40 @@ public class BedServiceImpl implements BedService {
 
         return new ApiResponse(1, "Bed deleted successfully", null);
     }
+
+    @Override
+    public ApiResponse getAllAvailableBedsByRoomId(Long roomId) {
+
+        List<Bed> beds = bedRepository.findAllByRoomRoomIdAndStatus(roomId,"AVAILABLE");
+
+        List<BedResponse> bedResponses = beds.stream()
+                .map(bed -> {
+
+                    BedResponse response = modelMapper.map(bed, BedResponse.class);
+
+                    response.setRoomId(bed.getRoom().getRoomId());
+
+                    return response;
+                }).toList();
+
+        return new ApiResponse(1, "Beds fetched successfully", bedResponses);
+    }
+
+    @Override
+    public ApiResponse getAllBedsByRoomId(Long roomId) {
+        List<Bed> beds = bedRepository.findAllByRoomRoomId(roomId);
+
+        List<BedResponse> bedResponses = beds.stream()
+                .map(bed -> {
+
+                    BedResponse response = modelMapper.map(bed, BedResponse.class);
+
+                    response.setRoomId(bed.getRoom().getRoomId());
+
+                    return response;
+                }).toList();
+
+        return new ApiResponse(1, "Beds fetched successfully", bedResponses);
+    }
 }
 

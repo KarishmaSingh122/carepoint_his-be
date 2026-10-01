@@ -102,4 +102,22 @@ public class WardRoomServiceImpl implements WardRoomService {
 
         return new ApiResponse(1, "Room updated successfully", roomResponse);
     }
+
+    @Override
+    public ApiResponse getRoomByWardId(Long wardId) {
+        // 1. Fetch the list of rooms or throw an exception if none are found
+        List<WardRoom> wardRoomList = wardRoomRepository.findAllByWardWardId(wardId);
+//                .orElseThrow(() -> new RuntimeException("Rooms not found for ward ID: " + wardId));
+
+        // 2. Map the list of WardRoom entities to a list of RoomResponse DTOs
+        List<RoomResponse> roomResponses = wardRoomList.stream()
+                .map(wardRoom -> {
+                    RoomResponse response = modelMapper.map(wardRoom, RoomResponse.class);
+                    response.setWardId(wardRoom.getWard().getWardId());
+                    return response;
+                }).toList();
+
+        // 3. Return the list inside your ApiResponse
+        return new ApiResponse(1, "Rooms fetched successfully", roomResponses);
+    }
 }

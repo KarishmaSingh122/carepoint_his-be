@@ -30,6 +30,7 @@ public class ApiConstant {
         public static final String GET = "/get";
         public static final String GET_BY_PATIENT_ID = "/get-patient-id";
         public static final String GET_BY_ABHA_ID = "/get-abha-id";
+        public static final String SEARCH = "/search";
 
         public static final String CREATE ="/create";
         public static final String UPDATE ="/update";
@@ -260,6 +261,7 @@ public class ApiConstant {
         public static final String CREATE = "/wardroom/create";
         public static final String GET_ALL = "/wardroom/get-all";
         public static final String GET_BY_ID = "/wardroom/get-by-id";
+        public static final String GET_BY_WARD_ID = "/wardroom/get-by-ward-id";
         public static final String UPDATE = "/wardroom/update";
         public static final String DELETE = "/wardroom/delete";
     }
@@ -272,6 +274,9 @@ public class ApiConstant {
         public static final String CREATE = "/bed/create";
         public static final String GET_ALL = "/bed/get-all";
         public static final String GET_BY_ID = "/bed/get-by-id/{bedId}";
+        public static final String GET_ALL_BY_ROOM_ID = "/bed/all/get-by-roomId";
+        public static final String GET_AVAILABLE_BEDS_BY_ROOM_ID = "/bed/avaialble/get-by-roomId";
+
         public static final String UPDATE = "/bed/update/{bedId}";
         public static final String DELETE = "/bed/delete/{bedId}";
     }

@@ -2,6 +2,7 @@ package com.suma.carepoint.services.bed;
 
 import com.suma.carepoint.models.ApiResponse;
 import com.suma.carepoint.models.bed.CreateBedRequest;
+import org.jspecify.annotations.Nullable;
 
 public interface BedService {
     ApiResponse createBed(CreateBedRequest createBedRequest);
@@ -13,4 +14,8 @@ public interface BedService {
     ApiResponse updateBed(Long bedId, CreateBedRequest createBedRequest);
 
     ApiResponse deleteBed(Long bedId);
+
+    ApiResponse getAllAvailableBedsByRoomId(Long roomId);
+
+    ApiResponse getAllBedsByRoomId(Long roomId);
 }

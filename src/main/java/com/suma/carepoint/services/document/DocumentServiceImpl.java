@@ -66,7 +66,7 @@ public class DocumentServiceImpl implements DocumentService {
         Patient patient = patientRepository.findById(patientId)
                 .orElseThrow(() -> new ResourceNotFoundException("Patient not found"));
 
-        User user = userRepository.findById(uploadedBy)
+        User user = userRepository.findByUserId(uploadedBy)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         Visit visit = resolveVisit(request.getVisitId());
 

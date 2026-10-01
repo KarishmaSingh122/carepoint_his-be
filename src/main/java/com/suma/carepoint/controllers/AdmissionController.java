@@ -28,6 +28,11 @@ public class AdmissionController {
         return ResponseEntity.ok().body (admissionService.getAdmissionById(admissionId));
     }
 
+    @GetMapping("/get-all/admit/patients")
+    public ResponseEntity<ApiResponse> getAllAdmitPatients() {
+        return ResponseEntity.ok().body (admissionService.getAllAdmitPatients());
+    }
+
     @GetMapping("/get-all")
     public ResponseEntity<ApiResponse> getAllAdmissions() {
         return ResponseEntity.ok().body (admissionService.getAllAdmissions());

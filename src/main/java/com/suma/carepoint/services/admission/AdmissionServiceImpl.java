@@ -1,16 +1,22 @@
     package com.suma.carepoint.services.admission;
 
     import com.suma.carepoint.entities.admission.Admission;
+    import com.suma.carepoint.entities.organization.Staff;
     import com.suma.carepoint.entities.patient.Patient;
     import com.suma.carepoint.models.ApiResponse;
     import com.suma.carepoint.models.admission.AdmissionResponse;
     import com.suma.carepoint.models.admission.CreateAdmissionRequest;
+    import com.suma.carepoint.models.patient.PatientResponse;
     import com.suma.carepoint.repositories.admisssion.AdmissionRepository;
+    import com.suma.carepoint.repositories.organization.StaffRepository;
     import com.suma.carepoint.repositories.patient.PatientRepository;
     import lombok.extern.slf4j.Slf4j;
     import org.modelmapper.ModelMapper;
     import org.springframework.stereotype.Service;
 
+    import java.time.LocalDateTime;
+    import java.time.format.DateTimeFormatter;
+    import java.util.ArrayList;
     import java.util.List;
 
     @Slf4j
@@ -20,12 +26,15 @@
         private final AdmissionRepository admissionRepository;
         private final PatientRepository patientRepository;
         private final ModelMapper modelMapper;
-
+        private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+        private final StaffRepository staffRepository;
         public AdmissionServiceImpl(AdmissionRepository admissionRepository, PatientRepository patientRepository,
-                                    ModelMapper modelMapper) {
+                                    ModelMapper modelMapper,
+                                    StaffRepository staffRepository) {
             this.admissionRepository = admissionRepository;
             this.patientRepository = patientRepository;
             this.modelMapper = modelMapper;
+            this.staffRepository= staffRepository;
         }
 
         @Override
@@ -34,13 +43,16 @@
 
                 Patient patient = patientRepository.findById(request.getPatientId()).orElseThrow(() ->
                                 new RuntimeException("Patient not found with id: " + request.getPatientId()));
+                Staff staff = staffRepository.findById(request.getAdmittingDoctorId()).orElseThrow(() ->
+                        new RuntimeException("Doctor  not found with id: " + request.getAdmittingDoctorId()));
 
                 Admission admission = new Admission();
 
-                admission.setAdmissionNumber(request.getAdmissionNumber());
+                admission.setAdmissionNumber(generateAdmissionNo(request.getPatientId()));
                 admission.setPatient(patient);
                 admission.setAdmissionDate(request.getAdmissionDate());
                 admission.setAdmissionType(request.getAdmissionType());
+                admission.setAdmittingDoctor(staff);
                 admission.setStatus(request.getStatus());
                 admission.setReason(request.getReason());
 
@@ -104,6 +116,12 @@
 
                                 if (admission.getPatient() != null) {
                                     response.setPatientId(admission.getPatient().getPatientId());
+                                    response.setPatientName(admission.getPatient().getFirstName()+" "+admission.getPatient().getLastName());
+                                }
+
+                                if(admission.getAdmittingDoctor()!= null){
+                                    response.setAdmittingDoctorId(admission.getAdmittingDoctor().getStaffId());
+                                    response.setAdmittingDoctorName(admission.getAdmittingDoctor().getFirstName()+" "+admission.getAdmittingDoctor().getLastName() );
                                 }
 
                                 response.setAdmissionDate(admission.getAdmissionDate());
@@ -157,6 +175,23 @@
         @Override
         public ApiResponse updateAdmission(Long admissionId) {
             return null;
+        }
+
+        @Override
+        public ApiResponse getAllAdmitPatients() {
+            List<PatientResponse> patientResponseList = new ArrayList<>();
+            patientResponseList = admissionRepository.findAdmittedPatients().stream().map(patient ->
+                    modelMapper.map(patient, PatientResponse.class) ).toList();
+
+            return new ApiResponse(1, "All Admitted Patients get successfully", patientResponseList);
+        }
+
+
+        //create admission no system generated
+        private String generateAdmissionNo(Long patientId){
+            String timestamp = LocalDateTime.now().format(formatter);
+            return "ADM-" + timestamp + "-" + patientId;
+
         }
 
     }

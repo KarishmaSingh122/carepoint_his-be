@@ -1,7 +1,10 @@
 package com.suma.carepoint.services.ward;
 
+import com.suma.carepoint.entities.wardrooms.WardRoom;
 import com.suma.carepoint.models.ApiResponse;
 import com.suma.carepoint.models.ward.CreateWardRequest;
+import com.suma.carepoint.models.wardrooms.CreateRoomRequest;
+import org.jspecify.annotations.Nullable;
 
 public interface WardService {
 
