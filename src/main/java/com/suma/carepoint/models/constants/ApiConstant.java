@@ -31,6 +31,7 @@ public class ApiConstant {
         public static final String GET_BY_PATIENT_ID = "/get-patient-id";
         public static final String GET_BY_ABHA_ID = "/get-abha-id";
         public static final String SEARCH = "/search";
+        public static final String EXISTS = "/exists";
 
         public static final String CREATE ="/create";
         public static final String UPDATE ="/update";

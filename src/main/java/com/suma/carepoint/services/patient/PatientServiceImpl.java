@@ -1,6 +1,8 @@
 package com.suma.carepoint.services.patient;
 
+import com.suma.carepoint.entities.patient.Gender;
 import com.suma.carepoint.entities.patient.Patient;
+import com.suma.carepoint.exceptions.ResourceNotFoundException;
 import com.suma.carepoint.models.ApiResponse;
 import com.suma.carepoint.models.patient.CreatePatientRequest;
 import com.suma.carepoint.models.patient.PatientResponse;
@@ -85,14 +87,20 @@ public class PatientServiceImpl implements PatientService{
         try {
             Patient patient = patientRepository.findById(patientId).orElseThrow(() -> new RuntimeException("Patient not found"));
 
-            patient.setCity(request.getCity());
-            patient.setAddress(request.getAddress());
-            patient.setEmail(request.getEmail());
-            patient.setBloodGroup(request.getBloodGroup());
+            patient.setFirstName(request.getFirstName());
+            patient.setLastName(request.getLastName());
             patient.setDateOfBirth(request.getDateOfBirth());
+            patient.setGender(Gender.valueOf(request.getGender()));
+            patient.setBloodGroup(request.getBloodGroup());
+            patient.setPhone(request.getPhone());
+            patient.setEmail(request.getEmail());
+            patient.setAddress(request.getAddress());
+            patient.setCity(request.getCity());
+            patient.setState(request.getState());
+            patient.setPincode(request.getPincode());
             patient.setEmergencyContactName(request.getEmergencyContactName());
             patient.setEmergencyContactPhone(request.getEmergencyContactPhone());
-            patient.setFirstName(request.getFirstName());
+
             patient = patientRepository.save(patient);
             patientResponse = modelMapper.map(patient,PatientResponse.class);
             ApiResponse response = new ApiResponse(1, "", patientResponse);
@@ -201,5 +209,13 @@ public class PatientServiceImpl implements PatientService{
         return buildPageResponse(patients, patients.getContent()
                 .stream().map(p->modelMapper.map(p, PatientResponse.class))
                 .collect(Collectors.toList()));
+    }
+
+    @Override
+    public ApiResponse getPatientStatusIfExists(String abhaId){
+        if (!patientRepository.existsByAbhaId(abhaId)) {
+            return new ApiResponse(2,"Patient not found!");
+        }
+        return new ApiResponse(1,"Patient found!",patientRepository.existsByAbhaIdAndActiveTrue(abhaId));
     }
 }

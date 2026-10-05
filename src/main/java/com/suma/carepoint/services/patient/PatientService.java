@@ -22,4 +22,6 @@ public interface PatientService {
      ApiResponse searchPatientByKeyword(String keyword);
 
      PageResponse getAllPatients(Boolean active, int page, int size);
+
+     ApiResponse getPatientStatusIfExists(String abhaId);
 }

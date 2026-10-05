@@ -7,6 +7,8 @@ import com.suma.carepoint.models.utility.PageResponse;
 import com.suma.carepoint.services.patient.PatientService;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -79,4 +81,12 @@ public class PatientController {
         ApiResponse apiResponse = new ApiResponse(1, "", response);
         return ResponseEntity.ok().body(apiResponse);
     }
+
+    @GetMapping(ApiConstant.Patient.EXISTS)
+    public ResponseEntity<ApiResponse> getPatientStatusIfExists(
+            @RequestParam(name="abhaId")
+            @NotBlank @Size(min = 6, max = 15)String abhaId) {
+        return ResponseEntity.ok().body(patientService.getPatientStatusIfExists(abhaId));
+    }
+
 }

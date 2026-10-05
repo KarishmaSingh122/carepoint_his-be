@@ -29,4 +29,7 @@ public interface PatientRepository  extends JpaRepository<Patient,Long> {
     List<Patient> searchByKeyword(@Param("keyword") String keyword);
 
     Page<Patient> findByActive(boolean active, Pageable pageable);
+
+    boolean existsByAbhaId(String abhaId);
+    boolean existsByAbhaIdAndActiveTrue(String abhaId);
 }
