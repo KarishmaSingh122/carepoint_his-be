@@ -1,5 +1,6 @@
 package com.suma.carepoint.services.ward;
 
+import com.suma.carepoint.entities.ward.Ward;
 import com.suma.carepoint.entities.wardrooms.WardRoom;
 import com.suma.carepoint.models.ApiResponse;
 import com.suma.carepoint.models.ward.CreateWardRequest;

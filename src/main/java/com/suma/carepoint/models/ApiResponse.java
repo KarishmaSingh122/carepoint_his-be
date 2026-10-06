@@ -1,11 +1,13 @@
 package com.suma.carepoint.models;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Builder
 public class ApiResponse {
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private int status;

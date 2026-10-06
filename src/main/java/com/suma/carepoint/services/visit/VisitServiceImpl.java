@@ -132,6 +132,23 @@ public class VisitServiceImpl implements VisitService {
     }
 
     @Override
+    public Visit getVisitByPatientId(Long patientId) {
+
+        if (patientId == null) {
+            throw new IllegalArgumentException("Patient ID is required");
+        }
+
+        VisitStatus visitStatus = parseStatus("OPEN");
+
+        return visitRepository
+                .findFirstByPatientPatientIdAndStatusOrderByVisitDateDesc(
+                        patientId,
+                        visitStatus
+                )
+                .orElse(null);
+    }
+
+    @Override
     public VisitResponse updateStatus(Long visitId, String status) {
         VisitStatus requestedStatus = VisitStatus.valueOf(status);
         Visit visit = findVisit(visitId);

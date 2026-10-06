@@ -13,4 +13,6 @@ public interface AdmissionRepository extends JpaRepository<Admission,Long>{
 
     @Query("SELECT a.patient FROM Admission a WHERE a.status = 'ADMITTED'")
     List<Patient> findAdmittedPatients();
+
+    Optional<Admission> findByPatientPatientId(Long pateintId);
 }

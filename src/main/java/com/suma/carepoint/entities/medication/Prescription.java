@@ -1,7 +1,9 @@
 package com.suma.carepoint.entities.medication;
 
 import com.suma.carepoint.entities.base.BaseEntity;
+import com.suma.carepoint.entities.organization.Staff;
 import com.suma.carepoint.entities.patient.Patient;
+import com.suma.carepoint.entities.visit.Visit;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,19 +32,19 @@ public class Prescription extends BaseEntity {
     )
     private Patient patient;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(
-//            name = "visit_id",
-//            foreignKey = @ForeignKey(name = "fk_prescription_visit")
-//    )
-//    private Visit visit;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "visit_id",
+            foreignKey = @ForeignKey(name = "fk_prescription_visit")
+    )
+    private Visit visit;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(
-//            name = "doctor_id",
-//            foreignKey = @ForeignKey(name = "fk_prescription_doctor")
-//    )
-//    private Staff doctor;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "doctor_id",
+            foreignKey = @ForeignKey(name = "fk_prescription_doctor")
+    )
+    private Staff doctor;
 
     @Column(name = "prescription_date", nullable = false)
     private OffsetDateTime prescriptionDate;

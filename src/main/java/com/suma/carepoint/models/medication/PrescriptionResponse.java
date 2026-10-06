@@ -20,6 +20,8 @@ public class PrescriptionResponse {
 
     private Long doctorId;
 
+    private String doctorName;
+
     private OffsetDateTime prescriptionDate;
 
     private String notes;

@@ -7,6 +7,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Optional;
+
 public interface VisitRepository extends JpaRepository<Visit, Long> {
 
     Page<Visit> findByPatientPatientId(
@@ -46,4 +48,6 @@ public interface VisitRepository extends JpaRepository<Visit, Long> {
             VisitStatus status,
             Pageable pageable
     );
+
+    Optional<Visit> findFirstByPatientPatientIdAndStatusOrderByVisitDateDesc(Long patientId, VisitStatus visitStatus);
 }

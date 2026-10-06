@@ -58,4 +58,5 @@ public interface DepartmentRepository
             @Param("active") Boolean active,
             Pageable pageable
     );
+
 }

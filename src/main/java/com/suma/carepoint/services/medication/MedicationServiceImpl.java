@@ -3,12 +3,15 @@ package com.suma.carepoint.services.medication;
 import com.suma.carepoint.entities.medication.Medication;
 import com.suma.carepoint.entities.medication.Prescription;
 import com.suma.carepoint.entities.medication.PrescriptionItem;
+import com.suma.carepoint.entities.organization.Staff;
 import com.suma.carepoint.models.ApiResponse;
 import com.suma.carepoint.models.medication.*;
 import com.suma.carepoint.repositories.medication.MedicationRepository;
 import com.suma.carepoint.repositories.medication.PrescriptionItemRepository;
 import com.suma.carepoint.repositories.medication.PrescriptionRepository;
+import com.suma.carepoint.repositories.organization.StaffRepository;
 import com.suma.carepoint.repositories.patient.PatientRepository;
+import com.suma.carepoint.repositories.visit.VisitRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -29,19 +32,26 @@ public class MedicationServiceImpl implements MedicationService {
     private final PrescriptionRepository prescriptionRepository;
     private final PrescriptionItemRepository prescriptionItemRepository;
     private final PatientRepository patientRepository;
+    private final StaffRepository staffRepository;
+    private final VisitRepository visitRepository;
 
     public MedicationServiceImpl(
             ModelMapper modelMapper,
             MedicationRepository medicationRepository,
             PrescriptionRepository prescriptionRepository,
             PrescriptionItemRepository prescriptionItemRepository,
-            PatientRepository patientRepository
+            PatientRepository patientRepository,
+            StaffRepository staffRepository,
+            VisitRepository visitRepository
+
     ) {
         this.modelMapper = modelMapper;
         this.medicationRepository = medicationRepository;
         this.prescriptionRepository = prescriptionRepository;
         this.prescriptionItemRepository = prescriptionItemRepository;
         this.patientRepository = patientRepository;
+        this.staffRepository = staffRepository;
+        this.visitRepository = visitRepository;
     }
 
     
@@ -711,33 +721,33 @@ public class MedicationServiceImpl implements MedicationService {
             /*
              * Validate doctor.
              */
-//            var doctor = staffRepository.findById(request.getDoctorId())
-//                    .orElse(null);
-//
-//            if (doctor == null) {
-//                return new ApiResponse(
-//                        2,
-//                        "Doctor/Staff not found with ID: " + request.getDoctorId(),
-//                        null,
-//                        0L
-//                );
-//            }
+            Staff doctor = staffRepository.findById(request.getDoctorId())
+                    .orElse(null);
+
+            if (doctor == null) {
+                return new ApiResponse(
+                        2,
+                        "Doctor/Staff not found with ID: " + request.getDoctorId(),
+                        null,
+                        0L
+                );
+            }
 
             /*
              * Validate visit if supplied.
              */
-//            var visit = request.getVisitId() != null
-//                    ? visitRepository.findById(request.getVisitId()).orElse(null)
-//                    : null;
+            var visit = request.getVisitId() != null
+                    ? visitRepository.findById(request.getVisitId()).orElse(null)
+                    : null;
 
-//            if (request.getVisitId() != null && visit == null) {
-//                return new ApiResponse(
-//                        2,
-//                        "Visit not found with ID: " + request.getVisitId(),
-//                        null,
-//                        0L
-//                );
-//            }
+            if (request.getVisitId() != null && visit == null) {
+                return new ApiResponse(
+                        2,
+                        "Visit not found with ID: " + request.getVisitId(),
+                        null,
+                        0L
+                );
+            }
 
             /*
              * Create prescription.
@@ -745,8 +755,8 @@ public class MedicationServiceImpl implements MedicationService {
             Prescription prescription = new Prescription();
 
             prescription.setPatient(patient);
-//            prescription.setDoctor(doctor);
-//            prescription.setVisit(visit);
+            prescription.setDoctor(doctor);
+            prescription.setVisit(visit);
 
             prescription.setPrescriptionDate(
                     request.getPrescriptionDate()
@@ -1299,6 +1309,59 @@ public class MedicationServiceImpl implements MedicationService {
     /**
      * Get patient's prescription history.
      */
+//    @Override
+//    @Transactional(readOnly = true)
+//    public ApiResponse getPatientPrescriptions(Long patientId) {
+//
+//        try {
+//
+//            if (patientId == null || patientId <= 0) {
+//                return new ApiResponse(
+//                        2,
+//                        "Valid patient ID is required",
+//                        null,
+//                        0L
+//                );
+//            }
+//
+//            List<Prescription> prescriptions =
+//                    prescriptionRepository.findByPatientPatientIdOrderByPrescriptionDateDesc(
+//                            patientId
+//                    );
+//
+//            List<PrescriptionResponse> response =
+//                    prescriptions.stream()
+//                            .map(prescription ->
+//                                    modelMapper.map(
+//                                            prescription,
+//                                            PrescriptionResponse.class
+//                                    )
+//                            )
+//                            .collect(Collectors.toList());
+//
+//            return new ApiResponse(
+//                    1,
+//                    "Patient prescriptions fetched successfully",
+//                    response,
+//                    Long.valueOf(response.size())
+//            );
+//
+//        } catch (Exception ex) {
+//
+//            log.error(
+//                    "Error while fetching prescriptions for patient ID: {}",
+//                    patientId,
+//                    ex
+//            );
+//
+//            return new ApiResponse(
+//                    2,
+//                    "Failed to fetch patient prescriptions",
+//                    null
+//            );
+//        }
+//    }
+
     @Override
     @Transactional(readOnly = true)
     public ApiResponse getPatientPrescriptions(Long patientId) {
@@ -1315,25 +1378,21 @@ public class MedicationServiceImpl implements MedicationService {
             }
 
             List<Prescription> prescriptions =
-                    prescriptionRepository.findByPatientPatientIdOrderByPrescriptionDateDesc(
-                            patientId
-                    );
+                    prescriptionRepository
+                            .findByPatientPatientIdOrderByPrescriptionDateDesc(
+                                    patientId
+                            );
 
             List<PrescriptionResponse> response =
                     prescriptions.stream()
-                            .map(prescription ->
-                                    modelMapper.map(
-                                            prescription,
-                                            PrescriptionResponse.class
-                                    )
-                            )
+                            .map(this::buildPrescriptionResponse)
                             .collect(Collectors.toList());
 
             return new ApiResponse(
                     1,
                     "Patient prescriptions fetched successfully",
                     response,
-                    Long.valueOf(response.size())
+                    (long) response.size()
             );
 
         } catch (Exception ex) {
@@ -1351,7 +1410,6 @@ public class MedicationServiceImpl implements MedicationService {
             );
         }
     }
-
     @Override
     public ApiResponse getVisitPrescriptions(Long visitId) {
         return null;
@@ -1478,22 +1536,22 @@ public class MedicationServiceImpl implements MedicationService {
 
 
     //response mapper
-    private PrescriptionResponse buildPrescriptionResponse(
-            Prescription prescription
-    ) {
-
-        PrescriptionResponse response =
-                modelMapper.map(
-                        prescription,
-                        PrescriptionResponse.class
-                );
-
-        response.setPatientId(
-                prescription.getPatient() != null
-                        ? prescription.getPatient().getPatientId()
-                        : null
-        );
-
+//    private PrescriptionResponse buildPrescriptionResponse(
+//            Prescription prescription
+//    ) {
+//
+//        PrescriptionResponse response =
+//                modelMapper.map(
+//                        prescription,
+//                        PrescriptionResponse.class
+//                );
+//
+//        response.setPatientId(
+//                prescription.getPatient() != null
+//                        ? prescription.getPatient().getPatientId()
+//                        : null
+//        );
+//
 //        response.setDoctorId(
 //                prescription.getDoctor() != null
 //                        ? prescription.getDoctor().getStaffId()
@@ -1505,18 +1563,100 @@ public class MedicationServiceImpl implements MedicationService {
 //                        ? prescription.getVisit().getVisitId()
 //                        : null
 //        );
+//
+//        if (prescription.getItems() != null) {
+//
+//            response.setItems(
+//                    prescription.getItems()
+//                            .stream()
+//                            .map(item ->
+//                                    modelMapper.map(
+//                                            item,
+//                                            PrescriptionItemResponse.class
+//                                    )
+//                            )
+//                            .toList()
+//            );
+//        }
+//
+//        return response;
+//    }
 
+    private PrescriptionResponse buildPrescriptionResponse(
+            Prescription prescription
+    ) {
+
+        PrescriptionResponse response =
+                modelMapper.map(
+                        prescription,
+                        PrescriptionResponse.class
+                );
+
+        // Patient
+        response.setPatientId(
+                prescription.getPatient() != null
+                        ? prescription.getPatient().getPatientId()
+                        : null
+        );
+
+        // Doctor
+        response.setDoctorId(
+                prescription.getDoctor() != null
+                        ? prescription.getDoctor().getStaffId()
+                        : null
+        );
+
+        response.setDoctorName(
+                prescription.getDoctor() != null
+                        ? prescription.getDoctor().getFirstName()+" "+prescription.getDoctor().getLastName()
+                        : null
+        );
+
+        // Visit
+        response.setVisitId(
+                prescription.getVisit() != null
+                        ? prescription.getVisit().getVisitId()
+                        : null
+        );
+
+        // Prescription items
         if (prescription.getItems() != null) {
 
             response.setItems(
                     prescription.getItems()
                             .stream()
-                            .map(item ->
-                                    modelMapper.map(
-                                            item,
-                                            PrescriptionItemResponse.class
-                                    )
-                            )
+                            .map(item -> {
+
+                                PrescriptionItemResponse itemResponse =
+                                        modelMapper.map(
+                                                item,
+                                                PrescriptionItemResponse.class
+                                        );
+
+                                // Medication details
+                                if (item.getMedication() != null) {
+
+                                    itemResponse.setMedicationId(
+                                            item.getMedication()
+                                                    .getMedicationId()
+                                    );
+
+                                    itemResponse.setMedicationName(
+                                            item.getMedication()
+                                                    .getName()
+                                    );
+                                    itemResponse.setStrength(
+                                            item.getMedication().getStrength()
+                                    );
+
+                                    itemResponse.setGenericName(
+                                            item.getMedication()
+                                                    .getGenericName()
+                                    );
+                                }
+
+                                return itemResponse;
+                            })
                             .toList()
             );
         }

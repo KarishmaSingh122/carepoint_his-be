@@ -28,6 +28,11 @@ public class AdmissionController {
         return ResponseEntity.ok().body (admissionService.getAdmissionById(admissionId));
     }
 
+    @GetMapping("/treatment/patient/{patientId}/workspace")
+    public ResponseEntity <ApiResponse> getPatientTreatmentWorkspaceByPatientId(@PathVariable Long patientId) {
+        return ResponseEntity.ok().body (admissionService.getPatientTreatmentWorkspaceByPatientId(patientId));
+    }
+
     @GetMapping("/get-all/admit/patients")
     public ResponseEntity<ApiResponse> getAllAdmitPatients() {
         return ResponseEntity.ok().body (admissionService.getAllAdmitPatients());

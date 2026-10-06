@@ -17,4 +17,6 @@ public interface AdmissionService {
     ApiResponse updateAdmission(Long admissionId);
 
     ApiResponse getAllAdmitPatients();
+
+    ApiResponse getPatientTreatmentWorkspaceByPatientId(Long patientId);
 }

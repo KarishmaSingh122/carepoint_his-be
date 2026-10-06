@@ -102,7 +102,6 @@ public class ProcedureController {
     }
 
 
-
     /**
      * Create Treatment
      */
@@ -159,7 +158,7 @@ public class ProcedureController {
      * Get Treatments By AdmissionId
      */
     @GetMapping(
-            ApiConstant.Procedure.ADMISSION_TREATMENTS+"/{admissionId}"
+            ApiConstant.Procedure.ADMISSION_TREATMENTS + "/{admissionId}"
     )
     public ResponseEntity<ApiResponse> getTreatmentsByAdmission(
             @PathVariable("admissionId") Long admissionId) {
@@ -173,7 +172,7 @@ public class ProcedureController {
      * Get Treatments By DoctorId
      */
     @GetMapping(
-            ApiConstant.Procedure.DOCTOR_TREATMENTS+"/{doctorId}"
+            ApiConstant.Procedure.DOCTOR_TREATMENTS + "/{doctorId}"
     )
     public ResponseEntity<ApiResponse> getTreatmentsByDoctor(
             @PathVariable("doctorId") Long doctorId) {
@@ -187,7 +186,7 @@ public class ProcedureController {
      * Get Treatments By ProcedureId
      */
     @GetMapping(
-            ApiConstant.Procedure.PROCEDURE_TREATMENTS+"/{procedureId}"
+            ApiConstant.Procedure.PROCEDURE_TREATMENTS + "/{procedureId}"
     )
     public ResponseEntity<ApiResponse> getTreatmentsByProcedure(
             @PathVariable("procedureId") Long procedureId) {
