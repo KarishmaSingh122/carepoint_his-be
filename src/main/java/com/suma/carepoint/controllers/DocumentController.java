@@ -4,6 +4,7 @@ package com.suma.carepoint.controllers;
 import com.suma.carepoint.entities.document.DocumentType;
 import com.suma.carepoint.models.ApiResponse;
 import com.suma.carepoint.models.constants.ApiConstant;
+import com.suma.carepoint.models.document.BulkDocumentItem;
 import com.suma.carepoint.models.document.DocumentRequest;
 import com.suma.carepoint.models.document.DocumentResponse;
 import com.suma.carepoint.models.utility.PageResponse;
@@ -19,8 +20,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(ApiConstant.Document.BASE)
@@ -28,6 +31,7 @@ import java.util.List;
 public class DocumentController {
 
     private final DocumentService documentService;
+    private final ObjectMapper objectMapper;
 
     @PostMapping(value = ApiConstant.Document.UPLOAD,
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -40,7 +44,7 @@ public class DocumentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse(1, "", response));
     }
 
-    @PostMapping(value = ApiConstant.Document.BULK_UPLOADS,
+   /* @PostMapping(value = ApiConstant.Document.BULK_UPLOADS,
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse> uploadDocuments(
             @RequestParam @Min(1) Long patientId,
@@ -54,7 +58,31 @@ public class DocumentController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponse(HttpStatus.CREATED.value(),
                         "Documents uploaded successfully.", response));
-    }
+    }*/
+   @PostMapping(value = ApiConstant.Document.BULK_UPLOADS, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+   public ResponseEntity<ApiResponse> uploadDocuments(
+           @RequestParam @Min(1) Long patientId,
+           @RequestParam @Min(1) Long uploadedBy,
+           @RequestParam(required = false) @Min(1) Long visitId,
+           @RequestParam(required = false) @Min(1) Long admissionId,
+           @RequestPart("documents") String documentsJson,
+           @RequestParam Map<String, MultipartFile> files){
+
+       List<BulkDocumentItem> documents = objectMapper.readValue(
+               documentsJson,
+               objectMapper.getTypeFactory().constructCollectionType(List.class, BulkDocumentItem.class)
+       );
+
+       List<DocumentResponse> response =
+               documentService.uploadDocuments(patientId, uploadedBy, visitId, admissionId, documents, files);
+
+       return ResponseEntity.status(HttpStatus.CREATED)
+               .body(new ApiResponse(
+                       1,
+                       "Documents uploaded successfully.",
+                       response
+               ));
+   }
 
 
     @GetMapping(ApiConstant.Document.GET_BY_ID)

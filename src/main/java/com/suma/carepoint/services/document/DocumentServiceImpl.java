@@ -9,6 +9,7 @@ import com.suma.carepoint.entities.visit.Visit;
 import com.suma.carepoint.exceptions.BadRequestException;
 import com.suma.carepoint.exceptions.ConflictException;
 import com.suma.carepoint.exceptions.ResourceNotFoundException;
+import com.suma.carepoint.models.document.BulkDocumentItem;
 import com.suma.carepoint.models.document.DocumentRequest;
 import com.suma.carepoint.models.document.DocumentResponse;
 import com.suma.carepoint.models.mapper.DocumentMapper;
@@ -35,10 +36,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.suma.carepoint.models.constants.ApiConstant.Document.MAX_TOTAL_FILES_SIZE;
@@ -71,9 +69,9 @@ public class DocumentServiceImpl implements DocumentService {
         Visit visit = resolveVisit(request.getVisitId());
 
         Admission admission = resolveAdmission(request.getAdmissionId());
-        if (visit == null && admission == null) {
-            throw new ConflictException("Either visitId or admissionId is required");
-        }
+//        if (visit == null && admission == null) {
+//            throw new ConflictException("Either visitId or admissionId is required");
+//        }
         if (visit != null && !visit.getPatient().getPatientId().equals(patientId)) {
             throw new ConflictException("Visit does not belong to patient");
         }
@@ -84,7 +82,8 @@ public class DocumentServiceImpl implements DocumentService {
         String originalFileName =
                 StringUtils.cleanPath(file.getOriginalFilename() == null ? "document" : file.getOriginalFilename());
         String extension = StringUtils.getFilenameExtension(originalFileName);
-        String storedFileName = UUID.randomUUID() + (extension == null ? "" : "." + extension);
+        String stripped = StringUtils.stripFilenameExtension(originalFileName);
+        String storedFileName = UUID.randomUUID()+"_"+stripped + (extension == null ? "" : "." + extension);
         Path patientDirectory = Paths.get(ROOT_FOLDER).toAbsolutePath().normalize().resolve(String.valueOf(patientId));
         Path targetPath = patientDirectory.resolve(storedFileName).normalize();
         if (!targetPath.startsWith(patientDirectory)) {
@@ -224,7 +223,7 @@ public class DocumentServiceImpl implements DocumentService {
         }
     }
 
-    @Override
+    /*@Override
     public List<DocumentResponse> uploadDocuments(Long patientId, Long uploadedBy,
                                                   DocumentRequest request, List<MultipartFile> files) {
         if (files == null || files.isEmpty()) {
@@ -303,6 +302,120 @@ public class DocumentServiceImpl implements DocumentService {
             deleteFiles(storedFiles);
             throw exception;
         }
+    }*/
+
+    @Override
+    public List<DocumentResponse> uploadDocuments(
+            Long patientId, Long uploadedBy, Long visitId, Long admissionId,
+            List<BulkDocumentItem> documents, Map<String, MultipartFile> files) {
+
+        validateBulkRequest(documents, files);
+
+        Patient patient = patientRepository.findById(patientId)
+                .orElseThrow(() -> new ResourceNotFoundException("Patient not found"));
+
+        User user = userRepository.findByUserId(uploadedBy)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        Visit visit = resolveVisit(visitId);
+        Admission admission = resolveAdmission(admissionId);
+
+        validatePatientRelationship(patientId, visit, admission);
+
+        long totalFileSize = documents.stream()
+                .map(BulkDocumentItem::getId)
+                .map(files::get)
+                .mapToLong(MultipartFile::getSize)
+                .sum();
+
+        if (totalFileSize > MAX_TOTAL_FILES_SIZE) {
+            throw new BadRequestException(
+                    "Total file size must not exceed " +
+                            (MAX_TOTAL_FILES_SIZE / (1024 * 1024L)) +
+                            " MB"
+            );
+        }
+
+        Path patientDirectory = Paths.get(
+                ROOT_FOLDER,
+                String.valueOf(patientId)
+        ).toAbsolutePath().normalize();
+
+        try {
+            Files.createDirectories(patientDirectory);
+        } catch (IOException exception) {
+            log.error(
+                    "Unable to create document storage directory. patientId={}",
+                    patientId,
+                    exception
+            );
+            throw new BadRequestException("Unable to initialize document storage");
+        }
+
+        List<Document> documentEntities = new ArrayList<>();
+        List<Path> storedFiles = new ArrayList<>();
+
+        try {
+            for (BulkDocumentItem item : documents) {
+
+                MultipartFile file = files.get(item.getId());
+                validateFile(file);
+                String originalFileName = StringUtils.cleanPath(
+                        Objects.requireNonNull(file.getOriginalFilename())
+                );
+
+                String extension = StringUtils.getFilenameExtension(originalFileName);
+                String stripped = StringUtils.stripFilenameExtension(originalFileName);
+                String storedFileName = UUID.randomUUID().toString();
+
+                if (StringUtils.hasText(extension)) {
+                    storedFileName = storedFileName+"_"+stripped + "." + extension;
+                }
+
+                Path targetPath = patientDirectory.resolve(storedFileName).normalize();
+
+                if (!targetPath.startsWith(patientDirectory)) {
+                    throw new BadRequestException("Invalid file path");
+                }
+
+                Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+                storedFiles.add(targetPath);
+
+                Document document = Document.builder()
+                        .patient(patient)
+                        .visit(visit)
+                        .admission(admission)
+                        .uploadedBy(user)
+                        .documentType(item.getDocumentType())
+                        .fileName(originalFileName)
+                        .filePath(targetPath.toString())
+                        .fileSize(file.getSize())
+                        .contentType(file.getContentType())
+                        .storedFileName(storedFileName)
+                        .verified(true)
+                        .build();
+
+                documentEntities.add(document);
+            }
+
+            List<Document> savedDocuments = documentRepository.saveAll(documentEntities);
+
+            log.info("Documents uploaded successfully. patientId={}, uploadedBy={}, count={}",
+                    patientId, uploadedBy, savedDocuments.size());
+
+            return savedDocuments.stream()
+                    .map(documentMapper::toResponse)
+                    .toList();
+
+        } catch (IOException exception) {
+            deleteFiles(storedFiles);
+            log.error("Failed to store documents. patientId={}", patientId, exception);
+            throw new BadRequestException("Unable to store documents");
+
+        } catch (RuntimeException exception) {
+            deleteFiles(storedFiles);
+            throw exception;
+        }
     }
 
     private void deleteFiles(List<Path> files) {
@@ -310,4 +423,50 @@ public class DocumentServiceImpl implements DocumentService {
             deleteStoredFile(path);
         }
     }
+
+    private void validateBulkRequest(List<BulkDocumentItem> documents, Map<String, MultipartFile> files) {
+
+        if (documents == null || documents.isEmpty()) {
+            throw new BadRequestException("At least one document is required");
+        }
+        if (files == null || files.isEmpty()) {
+            throw new BadRequestException("At least one file is required");
+        }
+        if (documents.size() != files.size()) {
+            throw new BadRequestException("Every document must have exactly one file");
+        }
+        Set<String> documentIds = new HashSet<>();
+
+        for (BulkDocumentItem item : documents) {
+            if (!StringUtils.hasText(item.getId())) {
+                throw new BadRequestException("Document id is required");
+            }
+            if (!documentIds.add(item.getId())) {
+                throw new BadRequestException("Duplicate document id: " + item.getId());
+            }
+            if (item.getDocumentType() == null) {
+                throw new BadRequestException("Document type is required");
+            }
+            MultipartFile file = files.get(item.getId());
+            if (file == null) {
+                throw new BadRequestException("File not found for document id: " + item.getId());
+            }
+        }
+    }
+
+    private void validatePatientRelationship(Long patientId, Visit visit, Admission admission) {
+
+//        if (visit == null && admission == null) {
+//            throw new ConflictException("Either visitId or admissionId is required");
+//        }
+
+        if (visit != null && !visit.getPatient().getPatientId().equals(patientId)) {
+            throw new ConflictException("Visit does not belong to patient");
+        }
+
+        if (admission != null && !admission.getPatient().getPatientId().equals(patientId)) {
+            throw new ConflictException("Admission does not belong to patient");
+        }
+    }
+
 }
