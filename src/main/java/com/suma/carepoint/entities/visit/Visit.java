@@ -2,6 +2,7 @@ package com.suma.carepoint.entities.visit;
 
 
 import com.suma.carepoint.entities.base.BaseEntity;
+import com.suma.carepoint.entities.emr.Diagnosis;
 import com.suma.carepoint.entities.organization.Department;
 import com.suma.carepoint.entities.organization.Staff;
 import com.suma.carepoint.entities.patient.Patient;
@@ -38,6 +39,10 @@ public class Visit extends BaseEntity {
     @JoinColumn(name = "department_id")
     private Department department;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "diagnosis_id")
+    private Diagnosis diagnosis;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "visit_type", nullable = false)
     private VisitType visitType;
@@ -51,6 +56,7 @@ public class Visit extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private VisitStatus status;
+
 
 
     @PrePersist

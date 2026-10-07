@@ -30,7 +30,6 @@ public class DiagnosisController {
         return ResponseEntity.ok().body(diagnosisService.getDiagnosises());
     }
 
-
     @GetMapping("/{diagnosisId}")
     public ResponseEntity<ApiResponse> getDiagnosisById(
             @PathVariable("diagnosisId") Long diagnosisId) {

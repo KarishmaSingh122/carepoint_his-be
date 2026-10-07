@@ -28,4 +28,6 @@ public class VisitRequest {
 
     @Size(max = 5000)
     private String reason;
+
+    private Long diagnosisId;
 }

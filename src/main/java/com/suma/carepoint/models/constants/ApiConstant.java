@@ -13,12 +13,9 @@ public class ApiConstant {
          public static final String HMIS = "api/hmis";
          public static final String BILL = "api/billing";
          public static final String HOSPITAL_SERVICE = "api/services";
-        public static final String MEDICATION = "api/medication";
-        public static final String PROCEDURE = "api/procedure";
-        public static final String DIAGNOSIS="api/diagnosis";
-
-
-
+         public static final String MEDICATION = "api/medication";
+         public static final String PROCEDURE = "api/procedure";
+         public static final String DIAGNOSIS="api/diagnosis";
 
     }
     public static class Hmis {
@@ -163,6 +160,7 @@ public class ApiConstant {
         public static final String ADMISSION_TREATMENTS ="/treatment/admission";
         public static final String DOCTOR_TREATMENTS ="/treatment/doctor";
         public static final String PROCEDURE_TREATMENTS ="/treatment/procedure";
+        public static final String PATIENT_TREATMENTS = "/patient";
 
     }
 
@@ -180,6 +178,7 @@ public class ApiConstant {
         public static final String GET_ALL = "";
         public static final String UPDATE = "/{medicalRecordId}";
         public static final String DELETE = "/{medicalRecordId}";
+        public static final String GET_DIAGNOSES_BY_PATIENT = "/patient/{patientId}/diagnoses";
     }
 
     public static final class Document {

@@ -32,6 +32,12 @@ public class VisitResponse {
     private String reason;
     private VisitStatus status;
 
+
+    private Long diagnosisId;
+    private String diagnosisCode;
+    private String diagnosisName;
+
     private Instant createdAt;
     private Instant updatedAt;
+
 }

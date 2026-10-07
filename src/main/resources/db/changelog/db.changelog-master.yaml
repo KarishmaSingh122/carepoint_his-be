@@ -95,5 +95,11 @@ databaseChangeLog:
 
   - include:
       file: db/changelog/v1/032-create-audit-logs.sql
+
+
   - include:
       file: db/changelog/v1/033-update-admission-status.sql
+
+
+  - include:
+      file: db/changelog/v1/034-update-visit.sql
