@@ -18,5 +18,7 @@ public interface AdmissionService {
 
     ApiResponse getAllAdmitPatients();
 
-    ApiResponse getPatientTreatmentWorkspaceByPatientId(Long patientId);
+    ApiResponse getPatientTreatmentWorkspaceByAdmissionId(Long patientId);
+
+    ApiResponse searchAdmissionByKeyword(String keyword);
 }

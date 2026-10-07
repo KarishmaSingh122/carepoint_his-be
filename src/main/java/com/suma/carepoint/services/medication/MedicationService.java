@@ -5,6 +5,7 @@ import com.suma.carepoint.models.medication.CreateMedicationRequest;
 import com.suma.carepoint.models.medication.MedicationStatusRequest;
 import com.suma.carepoint.models.medication.PrescriptionRequest;
 import com.suma.carepoint.models.medication.UpdateMedicationRequest;
+import org.jspecify.annotations.Nullable;
 
 public interface MedicationService {
 
@@ -61,4 +62,6 @@ public interface MedicationService {
     ApiResponse getVisitPrescriptions(Long visitId);
 
     ApiResponse getDoctorPrescriptions(Long doctorId);
+
+    ApiResponse getPatientPrescriptionsByAdmissionId(Long admissionId);
 }

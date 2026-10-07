@@ -141,6 +141,15 @@ public class MedicationController {
         return ResponseEntity.ok().body(medicationService.getPatientPrescriptions(patientId));
     }
 
+    /**
+     * Get Patient Prescription History
+     * GET /api/patients/{patientId}/prescriptions
+     */
+    @GetMapping(ApiConstant.Medication.ADMISSION_PRESCRIPTIONS + "/{admissionId}")
+    public ResponseEntity<ApiResponse> getPatientPrescriptionsByAdmissionId(@PathVariable("admissionId") Long admissionId) {
+
+        return ResponseEntity.ok().body(medicationService.getPatientPrescriptionsByAdmissionId(admissionId));
+    }
 
     /**
      * Get Visit Prescriptions

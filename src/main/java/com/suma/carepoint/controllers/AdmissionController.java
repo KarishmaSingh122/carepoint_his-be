@@ -28,9 +28,14 @@ public class AdmissionController {
         return ResponseEntity.ok().body (admissionService.getAdmissionById(admissionId));
     }
 
-    @GetMapping("/treatment/patient/{patientId}/workspace")
-    public ResponseEntity <ApiResponse> getPatientTreatmentWorkspaceByPatientId(@PathVariable Long patientId) {
-        return ResponseEntity.ok().body (admissionService.getPatientTreatmentWorkspaceByPatientId(patientId));
+    @GetMapping("/treatment/{admissionId}/workspace")
+    public ResponseEntity <ApiResponse> getPatientTreatmentWorkspaceByPatientId(@PathVariable Long admissionId) {
+        return ResponseEntity.ok().body (admissionService.getPatientTreatmentWorkspaceByAdmissionId(admissionId));
+    }
+
+    @GetMapping(ApiConstant.Admission.PATIENT_SEARCH)
+    public ResponseEntity<ApiResponse> searchPatientByKeyword(@RequestParam(name="keyword") String keyword) {
+        return ResponseEntity.ok().body(admissionService.searchAdmissionByKeyword(keyword));
     }
 
     @GetMapping("/get-all/admit/patients")

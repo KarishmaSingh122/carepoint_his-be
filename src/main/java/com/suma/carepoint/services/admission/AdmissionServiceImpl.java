@@ -251,10 +251,11 @@ public class AdmissionServiceImpl implements AdmissionService {
         return new ApiResponse(1, "All Admitted Patients get successfully", patientResponseList);
     }
 
-//    @Override
+//  @Override
 //    public ApiResponse getPatientTreatmentWorkspaceByPatientId(Long patientId) {
 //
 //        try {
+//
 //            // 1. Validate patient
 //            Patient patient = patientRepository.findById(patientId)
 //                    .orElseThrow(() ->
@@ -262,12 +263,18 @@ public class AdmissionServiceImpl implements AdmissionService {
 //                                    "Patient not found with id: " + patientId
 //                            )
 //                    );
-//            Visit visit =  visitService.getVisitByPatientId(patientId);
+//
+//            Visit visit = visitService.getVisitByPatientId(patientId);
 //
 //            // 2. Get admission for patient
 //            AdmissionResponse admissionResponse =
 //                    getAdmissionByPatientId(patient.getPatientId());
 //
+//            /*
+//             * Patient exists but does not have an admission.
+//             * We can still return patient information and empty
+//             * treatment/prescription lists.
+//             */
 //            if (admissionResponse == null) {
 //
 //                return ApiResponse.builder()
@@ -275,15 +282,18 @@ public class AdmissionServiceImpl implements AdmissionService {
 //                        .message("Patient found but no admission found")
 //                        .data(
 //                                TreatmentWorkspaceResponse.builder()
-//                                        .patient(buildPatientWorkspaceResponse(patient))
+//                                        .patient(
+//                                                buildPatientWorkspaceResponse(patient)
+//                                        )
 //                                        .admission(null)
 //                                        .treatments(Collections.emptyList())
+//                                        .prescriptions(Collections.emptyList())
 //                                        .build()
 //                        )
 //                        .build();
 //            }
 //
-//            // 3. Get treatments using admission id
+//            // 3. Get treatments using admission ID
 //            ApiResponse treatmentApiResponse =
 //                    procedureService.getTreatmentsByAdmission(
 //                            admissionResponse.getAdmissionId()
@@ -301,28 +311,101 @@ public class AdmissionServiceImpl implements AdmissionService {
 //                                treatmentApiResponse.getData();
 //            }
 //
-//            // 4. Map patient
+//            // 4. Get prescriptions using patient ID
+//            ApiResponse prescriptionApiResponse =
+//                    medicationService.getPatientPrescriptions(patientId);
+//
+//            List<PrescriptionResponse> prescriptions =
+//                    Collections.emptyList();
+//
+//            if (prescriptionApiResponse != null
+//                    && prescriptionApiResponse.getStatus() == 1
+//                    && prescriptionApiResponse.getData() != null) {
+//
+//                prescriptions =
+//                        (List<PrescriptionResponse>)
+//                                prescriptionApiResponse.getData();
+//            }
+//
+//            // 5. Map patient
 //            TreatmentWorkspacePatientResponse patientResponse =
 //                    buildPatientWorkspaceResponse(patient);
 //
-//            // 5. Map admission
+//            // 6. Map admission
 //            TreatmentWorkspaceAdmissionResponse workspaceAdmission =
 //                    modelMapper.map(
 //                            admissionResponse,
 //                            TreatmentWorkspaceAdmissionResponse.class
 //                    );
-//            BedAssignment  bedAssignment = bedAssignmentRepository.findByAdmissionAdmissionId(workspaceAdmission.getAdmissionId());
-//            workspaceAdmission.setAdmissionDate(admissionResponse.getAdmissionDate());
-//            workspaceAdmission.setDepartmentId(visit.getDepartment().getDepartmentId());
-//            workspaceAdmission.setDepartmentName(visit.getDepartment().getDepartmentName());
-//            workspaceAdmission.setBedId(bedAssignment.getBed().getBedId());
-//            workspaceAdmission.setBedNumber(bedAssignment.getBed().getBedNumber());
-//            workspaceAdmission.setRoomId(bedAssignment.getBed().getRoom().getRoomId());
-//            workspaceAdmission.setRoomNumber(bedAssignment.getBed().getRoom().getRoomNumber());
-//            workspaceAdmission.setWardId(bedAssignment.getBed().getRoom().getWard().getWardId());
-//            workspaceAdmission.setWardName(bedAssignment.getBed().getRoom().getWard().getWardName());
 //
-//            // 6. Map treatments
+//            BedAssignment bedAssignment =
+//                    bedAssignmentRepository
+//                            .findByAdmissionAdmissionId(
+//                                    workspaceAdmission.getAdmissionId()
+//                            );
+//
+//            workspaceAdmission.setAdmissionDate(
+//                    admissionResponse.getAdmissionDate()
+//            );
+//
+//            if (visit != null && visit.getDepartment() != null) {
+//
+//                workspaceAdmission.setDepartmentId(
+//                        visit.getDepartment().getDepartmentId()
+//                );
+//
+//                workspaceAdmission.setDepartmentName(
+//                        visit.getDepartment().getDepartmentName()
+//                );
+//            }
+//
+//            if (bedAssignment != null
+//                    && bedAssignment.getBed() != null) {
+//
+//                workspaceAdmission.setBedId(
+//                        bedAssignment.getBed().getBedId()
+//                );
+//
+//                workspaceAdmission.setBedNumber(
+//                        bedAssignment.getBed().getBedNumber()
+//                );
+//
+//                if (bedAssignment.getBed().getRoom() != null) {
+//
+//                    workspaceAdmission.setRoomId(
+//                            bedAssignment.getBed()
+//                                    .getRoom()
+//                                    .getRoomId()
+//                    );
+//
+//                    workspaceAdmission.setRoomNumber(
+//                            bedAssignment.getBed()
+//                                    .getRoom()
+//                                    .getRoomNumber()
+//                    );
+//
+//                    if (bedAssignment.getBed()
+//                            .getRoom()
+//                            .getWard() != null) {
+//
+//                        workspaceAdmission.setWardId(
+//                                bedAssignment.getBed()
+//                                        .getRoom()
+//                                        .getWard()
+//                                        .getWardId()
+//                        );
+//
+//                        workspaceAdmission.setWardName(
+//                                bedAssignment.getBed()
+//                                        .getRoom()
+//                                        .getWard()
+//                                        .getWardName()
+//                        );
+//                    }
+//                }
+//            }
+//
+//            // 7. Map treatments
 //            List<TreatmentWorkspaceTreatmentResponse> treatments =
 //                    patientTreatments.stream()
 //                            .map(treatment ->
@@ -333,10 +416,7 @@ public class AdmissionServiceImpl implements AdmissionService {
 //                            )
 //                            .toList();
 //
-//            //prescriptions
-//            ApiResponse prescriptionResponse = medicationService.getPatientPrescriptions(patientId);
-//
-//            // 7. Build workspace
+//            // 8. Build workspace
 //            TreatmentWorkspaceResponse workspace =
 //                    TreatmentWorkspaceResponse.builder()
 //                            .patient(patientResponse)
@@ -345,14 +425,17 @@ public class AdmissionServiceImpl implements AdmissionService {
 //                            .prescriptions(prescriptions)
 //                            .build();
 //
-//            // 8. Return standard API response
+//            // 9. Return standard API response
 //            return ApiResponse.builder()
 //                    .status(1)
-//                    .message("Patient treatment workspace fetched successfully")
+//                    .message(
+//                            "Patient treatment workspace fetched successfully"
+//                    )
 //                    .data(workspace)
 //                    .build();
 //
 //        } catch (ResourceNotFoundException e) {
+//
 //            log.error(
 //                    "Patient treatment workspace not found for patientId: {}",
 //                    patientId,
@@ -366,6 +449,7 @@ public class AdmissionServiceImpl implements AdmissionService {
 //                    .build();
 //
 //        } catch (Exception e) {
+//
 //            log.error(
 //                    "Error while fetching treatment workspace for patientId: {}",
 //                    patientId,
@@ -381,52 +465,35 @@ public class AdmissionServiceImpl implements AdmissionService {
 //    }
 
     @Override
-    public ApiResponse getPatientTreatmentWorkspaceByPatientId(Long patientId) {
+    public ApiResponse getPatientTreatmentWorkspaceByAdmissionId(Long admissionId) {
 
         try {
 
-            // 1. Validate patient
-            Patient patient = patientRepository.findById(patientId)
+            // 1. Validate admission
+            Admission admission = admissionRepository.findById(admissionId)
                     .orElseThrow(() ->
                             new ResourceNotFoundException(
-                                    "Patient not found with id: " + patientId
+                                    "Admission not found with id: " + admissionId
                             )
                     );
 
-            Visit visit = visitService.getVisitByPatientId(patientId);
+            // 2. Get patient from admission
+            Patient patient = admission.getPatient();
 
-            // 2. Get admission for patient
-            AdmissionResponse admissionResponse =
-                    getAdmissionByPatientId(patient.getPatientId());
-
-            /*
-             * Patient exists but does not have an admission.
-             * We can still return patient information and empty
-             * treatment/prescription lists.
-             */
-            if (admissionResponse == null) {
-
-                return ApiResponse.builder()
-                        .status(1)
-                        .message("Patient found but no admission found")
-                        .data(
-                                TreatmentWorkspaceResponse.builder()
-                                        .patient(
-                                                buildPatientWorkspaceResponse(patient)
-                                        )
-                                        .admission(null)
-                                        .treatments(Collections.emptyList())
-                                        .prescriptions(Collections.emptyList())
-                                        .build()
-                        )
-                        .build();
+            if (patient == null) {
+                throw new ResourceNotFoundException(
+                        "Patient not found for admission id: " + admissionId
+                );
             }
 
-            // 3. Get treatments using admission ID
+            Long patientId = patient.getPatientId();
+
+            // 3. Get visit information for this patient
+            Visit visit = visitService.getVisitByPatientId(patientId);
+
+            // 4. Get treatments using CURRENT admission ID
             ApiResponse treatmentApiResponse =
-                    procedureService.getTreatmentsByAdmission(
-                            admissionResponse.getAdmissionId()
-                    );
+                    procedureService.getTreatmentsByAdmission(admissionId);
 
             List<PatientTreatmentResponse> patientTreatments =
                     Collections.emptyList();
@@ -440,7 +507,7 @@ public class AdmissionServiceImpl implements AdmissionService {
                                 treatmentApiResponse.getData();
             }
 
-            // 4. Get prescriptions using patient ID
+            // 5. Get prescriptions using patient ID
             ApiResponse prescriptionApiResponse =
                     medicationService.getPatientPrescriptions(patientId);
 
@@ -456,27 +523,27 @@ public class AdmissionServiceImpl implements AdmissionService {
                                 prescriptionApiResponse.getData();
             }
 
-            // 5. Map patient
+            // 6. Map patient
             TreatmentWorkspacePatientResponse patientResponse =
                     buildPatientWorkspaceResponse(patient);
 
-            // 6. Map admission
+            // 7. Map admission
             TreatmentWorkspaceAdmissionResponse workspaceAdmission =
                     modelMapper.map(
-                            admissionResponse,
+                            admission,
                             TreatmentWorkspaceAdmissionResponse.class
                     );
 
-            BedAssignment bedAssignment =
-                    bedAssignmentRepository
-                            .findByAdmissionAdmissionId(
-                                    workspaceAdmission.getAdmissionId()
-                            );
-
             workspaceAdmission.setAdmissionDate(
-                    admissionResponse.getAdmissionDate()
+                    admission.getAdmissionDate()
             );
+            workspaceAdmission.setAdmissionNumber(
+                    admission.getAdmissionNumber()
+            );
+            workspaceAdmission.setAdmittingDoctorId(admission.getAdmittingDoctor().getStaffId());
+            workspaceAdmission.setAdmittingDoctorName(admission.getAdmittingDoctor().getFirstName()+" "+admission.getAdmittingDoctor().getLastName());
 
+            // 8. Add visit / department information
             if (visit != null && visit.getDepartment() != null) {
 
                 workspaceAdmission.setDepartmentId(
@@ -487,6 +554,11 @@ public class AdmissionServiceImpl implements AdmissionService {
                         visit.getDepartment().getDepartmentName()
                 );
             }
+
+            // 9. Get bed assignment
+            BedAssignment bedAssignment =
+                    bedAssignmentRepository
+                            .findByAdmissionAdmissionId(admissionId);
 
             if (bedAssignment != null
                     && bedAssignment.getBed() != null) {
@@ -534,7 +606,7 @@ public class AdmissionServiceImpl implements AdmissionService {
                 }
             }
 
-            // 7. Map treatments
+            // 10. Map treatments
             List<TreatmentWorkspaceTreatmentResponse> treatments =
                     patientTreatments.stream()
                             .map(treatment ->
@@ -545,7 +617,7 @@ public class AdmissionServiceImpl implements AdmissionService {
                             )
                             .toList();
 
-            // 8. Build workspace
+            // 11. Build current workspace
             TreatmentWorkspaceResponse workspace =
                     TreatmentWorkspaceResponse.builder()
                             .patient(patientResponse)
@@ -554,7 +626,7 @@ public class AdmissionServiceImpl implements AdmissionService {
                             .prescriptions(prescriptions)
                             .build();
 
-            // 9. Return standard API response
+            // 12. Return workspace
             return ApiResponse.builder()
                     .status(1)
                     .message(
@@ -566,8 +638,8 @@ public class AdmissionServiceImpl implements AdmissionService {
         } catch (ResourceNotFoundException e) {
 
             log.error(
-                    "Patient treatment workspace not found for patientId: {}",
-                    patientId,
+                    "Treatment workspace not found for admissionId: {}",
+                    admissionId,
                     e
             );
 
@@ -580,18 +652,108 @@ public class AdmissionServiceImpl implements AdmissionService {
         } catch (Exception e) {
 
             log.error(
-                    "Error while fetching treatment workspace for patientId: {}",
-                    patientId,
+                    "Error while fetching treatment workspace for admissionId: {}",
+                    admissionId,
                     e
             );
 
             return ApiResponse.builder()
                     .status(2)
-                    .message("Failed to fetch patient treatment workspace")
+                    .message(
+                            "Failed to fetch patient treatment workspace"
+                    )
                     .data(null)
                     .build();
         }
     }
+
+
+    @Override
+    public ApiResponse searchAdmissionByKeyword(String keyword) {
+
+        // Validate keyword
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return new ApiResponse(
+                    2,
+                    "Search keyword is required",
+                    null
+            );
+        }
+
+        String searchKeyword = keyword.trim();
+
+        // Prevent unnecessarily short searches
+        if (searchKeyword.length() < 2) {
+            return new ApiResponse(
+                    2,
+                    "Search keyword must contain at least 2 characters",
+                    null
+            );
+        }
+
+        try {
+
+            List<Admission> admissions =
+                    admissionRepository.searchActiveAdmissionsByKeyword(searchKeyword);
+
+            if (admissions == null || admissions.isEmpty()) {
+                return new ApiResponse(
+                        1,
+                        "No active admissions found",
+                        Collections.emptyList(),
+                        0L
+                );
+            }
+
+            List<AdmissionResponse> admissionResponses = admissions.stream()
+                    .map(admission -> {
+
+                        AdmissionResponse response = new AdmissionResponse();
+
+                        response.setAdmissionId(admission.getAdmissionId());
+                        response.setAdmissionNumber(admission.getAdmissionNumber());
+
+                        if (admission.getPatient() != null) {
+                            response.setPatientId(admission.getPatient().getPatientId());
+                            response.setPatientName(admission.getPatient().getFirstName() + " " + admission.getPatient().getLastName());
+                        }
+
+                        if (admission.getAdmittingDoctor() != null) {
+                            response.setAdmittingDoctorId(admission.getAdmittingDoctor().getStaffId());
+                            response.setAdmittingDoctorName(admission.getAdmittingDoctor().getFirstName() + " " + admission.getAdmittingDoctor().getLastName());
+                        }
+
+                        response.setAdmissionDate(admission.getAdmissionDate());
+                        response.setAdmissionType(admission.getAdmissionType());
+                        response.setStatus(admission.getStatus());
+                        response.setReason(admission.getReason());
+
+                        return response;
+                    }).toList();
+
+            return new ApiResponse(
+                    1,
+                    "Admissions found successfully",
+                    admissionResponses,
+                    (long) admissionResponses.size()
+            );
+
+        } catch (Exception e) {
+
+            log.error(
+                    "Error while searching active admissions with keyword: {}",
+                    searchKeyword,
+                    e
+            );
+
+            return new ApiResponse(
+                    2,
+                    "Unable to search admissions",
+                    null
+            );
+        }
+    }
+
     private TreatmentWorkspacePatientResponse buildPatientWorkspaceResponse(
             Patient patient) {
 

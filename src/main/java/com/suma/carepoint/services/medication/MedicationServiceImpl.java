@@ -1410,127 +1410,124 @@ public class MedicationServiceImpl implements MedicationService {
             );
         }
     }
-    @Override
-    public ApiResponse getVisitPrescriptions(Long visitId) {
-        return null;
-    }
+
 
     @Override
-    public ApiResponse getDoctorPrescriptions(Long doctorId) {
+    public ApiResponse getPatientPrescriptionsByAdmissionId(Long admissionId) {
         return null;
     }
 
     /**
      * Get prescriptions for a visit.
      */
-//    @Override
-//    @Transactional(readOnly = true)
-//    public ApiResponse getVisitPrescriptions(Long visitId) {
-//
-//        try {
-//
-//            if (visitId == null || visitId <= 0) {
-//                return new ApiResponse(
-//                        2,
-//                        "Valid visit ID is required",
-//                        null,
-//                        0L
-//                );
-//            }
-//
-//            List<Prescription> prescriptions =
-//                    prescriptionRepository.findByVisitVisitIdOrderByPrescriptionDateDesc(
-//                            visitId
-//                    );
-//
-//            List<PrescriptionResponse> response =
-//                    prescriptions.stream()
-//                            .map(prescription ->
-//                                    modelMapper.map(
-//                                            prescription,
-//                                            PrescriptionResponse.class
-//                                    )
-//                            )
-//                            .collect(Collectors.toList());
-//
-//            return new ApiResponse(
-//                    1,
-//                    "Visit prescriptions fetched successfully",
-//                    response,
-//                    Long.valueOf(response.size())
-//            );
-//
-//        } catch (Exception ex) {
-//
-//            log.error(
-//                    "Error while fetching prescriptions for visit ID: {}",
-//                    visitId,
-//                    ex
-//            );
-//
-//            return new ApiResponse(
-//                    2,
-//                    "Failed to fetch visit prescriptions",
-//                    null
-//            );
-//        }
-//    }
+    @Override
+    @Transactional(readOnly = true)
+    public ApiResponse getVisitPrescriptions(Long visitId) {
+
+        try {
+
+            if (visitId == null || visitId <= 0) {
+                return new ApiResponse(
+                        2,
+                        "Valid visit ID is required",
+                        null,
+                        0L
+                );
+            }
+
+            List<Prescription> prescriptions =
+                    prescriptionRepository.findByVisitVisitIdOrderByPrescriptionDateDesc(
+                            visitId
+                    );
+
+            List<PrescriptionResponse> response =
+                    prescriptions.stream()
+                            .map(prescription ->
+                                    modelMapper.map(
+                                            prescription,
+                                            PrescriptionResponse.class
+                                    )
+                            )
+                            .collect(Collectors.toList());
+
+            return new ApiResponse(
+                    1,
+                    "Visit prescriptions fetched successfully",
+                    response,
+                    Long.valueOf(response.size())
+            );
+
+        } catch (Exception ex) {
+
+            log.error(
+                    "Error while fetching prescriptions for visit ID: {}",
+                    visitId,
+                    ex
+            );
+
+            return new ApiResponse(
+                    2,
+                    "Failed to fetch visit prescriptions",
+                    null
+            );
+        }
+    }
 
     /**
      * Get prescriptions created by doctor.
      */
-//    @Override
-//    @Transactional(readOnly = true)
-//    public ApiResponse getDoctorPrescriptions(Long doctorId) {
-//
-//        try {
-//
-//            if (doctorId == null || doctorId <= 0) {
-//                return new ApiResponse(
-//                        2,
-//                        "Valid doctor ID is required",
-//                        null,
-//                        0L
-//                );
-//            }
-//
-//            List<Prescription> prescriptions =
-//                    prescriptionRepository.findByDoctorStaffIdOrderByPrescriptionDateDesc(
-//                            doctorId
-//                    );
-//
-//            List<PrescriptionResponse> response =
-//                    prescriptions.stream()
-//                            .map(prescription ->
-//                                    modelMapper.map(
-//                                            prescription,
-//                                            PrescriptionResponse.class
-//                                    )
-//                            )
-//                            .collect(Collectors.toList());
-//
-//            return new ApiResponse(
-//                    1,
-//                    "Doctor prescriptions fetched successfully",
-//                    response,
-//                    Long.valueOf(response.size())
-//            );
-//
-//        } catch (Exception ex) {
-//
-//            log.error(
-//                    "Error while fetching prescriptions for doctor ID: {}",
-//                    doctorId,
-//                    ex
-//            );
-//
-//            return new ApiResponse(
-//                    2,
-//                    "Failed to fetch doctor prescriptions",
-//                    null
-//            );
-//        }
-//    }
+    @Override
+    @Transactional(readOnly = true)
+    public ApiResponse getDoctorPrescriptions(Long doctorId) {
+
+        try {
+
+            if (doctorId == null || doctorId <= 0) {
+                return new ApiResponse(
+                        2,
+                        "Valid doctor ID is required",
+                        null,
+                        0L
+                );
+            }
+
+            List<Prescription> prescriptions =
+                    prescriptionRepository.findByDoctorStaffIdOrderByPrescriptionDateDesc(
+                            doctorId
+                    );
+
+            List<PrescriptionResponse> response =
+                    prescriptions.stream()
+                            .map(prescription ->
+                                    modelMapper.map(
+                                            prescription,
+                                            PrescriptionResponse.class
+                                    )
+                            )
+                            .collect(Collectors.toList());
+
+            return new ApiResponse(
+                    1,
+                    "Doctor prescriptions fetched successfully",
+                    response,
+                    Long.valueOf(response.size())
+            );
+
+        } catch (Exception ex) {
+
+            log.error(
+                    "Error while fetching prescriptions for doctor ID: {}",
+                    doctorId,
+                    ex
+            );
+
+            return new ApiResponse(
+                    2,
+                    "Failed to fetch doctor prescriptions",
+                    null
+            );
+        }
+    }
 
 
 

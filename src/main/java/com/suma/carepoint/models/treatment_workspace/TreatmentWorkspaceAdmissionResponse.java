@@ -16,6 +16,8 @@ public class TreatmentWorkspaceAdmissionResponse {
 
     private Long admissionId;
 
+    private String admissionNumber;
+
     private OffsetDateTime admissionDate;
 
     private String admissionType;

@@ -31,7 +31,7 @@ public class PatientController {
         return ResponseEntity.ok().body(patientService.getPatientByAbhaId(abhaId));
     }
 
-    @GetMapping(ApiConstant.Patient.SEARCH)
+    @GetMapping(ApiConstant.Patient.PATIENT_SEARCH)
     public ResponseEntity<ApiResponse> searchPatientByKeyword(@RequestParam(name="keyword") String keyword) {
         return ResponseEntity.ok().body(patientService.searchPatientByKeyword(keyword));
     }
