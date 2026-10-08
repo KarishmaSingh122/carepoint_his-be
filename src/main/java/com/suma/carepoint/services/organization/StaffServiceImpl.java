@@ -4,14 +4,19 @@ import com.suma.carepoint.entities.organization.Department;
 import com.suma.carepoint.entities.organization.Staff;
 import com.suma.carepoint.exceptions.ConflictException;
 import com.suma.carepoint.exceptions.ResourceNotFoundException;
+import com.suma.carepoint.models.auth.UserRequest;
 import com.suma.carepoint.models.mapper.StaffMapper;
 import com.suma.carepoint.models.organization.StaffRequest;
 import com.suma.carepoint.models.organization.StaffResponse;
 import com.suma.carepoint.models.utility.PageResponse;
 import com.suma.carepoint.repositories.organization.DepartmentRepository;
 import com.suma.carepoint.repositories.organization.StaffRepository;
+import com.suma.carepoint.services.auth.UserService;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,15 +29,29 @@ import static com.suma.carepoint.models.utility.PageResponse.buildPageResponse;
 import static com.suma.carepoint.models.utility.PageResponse.validatePagination;
 import static com.suma.carepoint.models.utility.TextNormalizationUtils.normalize;
 import static com.suma.carepoint.models.utility.TextNormalizationUtils.normalizeSearch;
-
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class StaffServiceImpl implements StaffService {
 
     private final StaffRepository staffRepository;
     private final DepartmentRepository departmentRepository;
     private final StaffMapper staffMapper;
+    private final UserService userService;
+    private final String defaultPassword;
+
+    // Single constructor: Spring automatically uses this for injection
+    public StaffServiceImpl(
+            StaffRepository staffRepository,
+            DepartmentRepository departmentRepository,
+            StaffMapper staffMapper,
+            UserService userService,
+            @Value("${app.default-password}") String defaultPassword) {
+        this.staffRepository = staffRepository;
+        this.departmentRepository = departmentRepository;
+        this.staffMapper = staffMapper;
+        this.userService = userService;
+        this.defaultPassword = defaultPassword;
+    }
 
     @Override
     public StaffResponse createStaff(StaffRequest request) {
@@ -53,6 +72,9 @@ public class StaffServiceImpl implements StaffService {
         staff.setActive(true);
         try {
             Staff savedStaff = staffRepository.save(staff);
+
+            UserRequest userRequest =  UserRequest.builder().staffId(savedStaff.getStaffId()).username(savedStaff.getEmail()).password(defaultPassword).build();
+            userService.create(userRequest);
             log.info("Staff created successfully. staffId={}, employeeNo={}, departmentId={}",
                     savedStaff.getStaffId(), savedStaff.getEmployeeNo(), department.getDepartmentId());
             return staffMapper.toResponse(savedStaff);
