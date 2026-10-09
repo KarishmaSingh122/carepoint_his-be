@@ -4,6 +4,7 @@ import com.suma.carepoint.entities.wardrooms.WardRoom;
 import com.suma.carepoint.models.ApiResponse;
 import com.suma.carepoint.models.constants.ApiConstant;
 import com.suma.carepoint.models.wardrooms.CreateRoomRequest;
+import com.suma.carepoint.models.wardrooms.RoomRequest;
 import com.suma.carepoint.services.rooms.WardRoomService;
 import com.suma.carepoint.services.rooms.WardRoomServiceImpl;
 import com.suma.carepoint.services.ward.WardService;
@@ -38,8 +39,8 @@ public class WardRoomController {
     }
 
     @PutMapping(ApiConstant.WardRoom.UPDATE)
-    public ResponseEntity<ApiResponse> updateRoom(@RequestBody WardRoom wardRoom) {
-        return ResponseEntity.ok(wardRoomService.updateRoom(wardRoom));
+    public ResponseEntity<ApiResponse> updateRoom(@RequestParam Long roomId,@RequestBody RoomRequest wardRoom) {
+        return ResponseEntity.ok(wardRoomService.updateRoom(roomId, wardRoom));
     }
 
     @DeleteMapping(ApiConstant.WardRoom.DELETE)

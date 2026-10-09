@@ -3,6 +3,7 @@ package com.suma.carepoint.services.rooms;
 import com.suma.carepoint.entities.wardrooms.WardRoom;
 import com.suma.carepoint.models.ApiResponse;
 import com.suma.carepoint.models.wardrooms.CreateRoomRequest;
+import com.suma.carepoint.models.wardrooms.RoomRequest;
 import org.jspecify.annotations.Nullable;
 
 public interface WardRoomService {
@@ -15,7 +16,7 @@ public interface WardRoomService {
 
     ApiResponse deleteRooom(Long roomId);
 
-    ApiResponse updateRoom(WardRoom wardRoom);
+    ApiResponse updateRoom(Long roomId, RoomRequest wardRoom);
 
     ApiResponse getRoomByWardId(Long wardId);
 }

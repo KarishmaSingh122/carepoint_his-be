@@ -14,6 +14,8 @@ public class UserRequest {
 
     private Long staffId;
 
+    private Long roleId;
+
     @NotBlank
     @Size(min = 3, max = 100)
     private String username;

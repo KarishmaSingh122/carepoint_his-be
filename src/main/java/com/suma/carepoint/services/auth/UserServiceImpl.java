@@ -6,6 +6,7 @@ import com.suma.carepoint.exceptions.ConflictException;
 import com.suma.carepoint.exceptions.ResourceNotFoundException;
 import com.suma.carepoint.models.auth.UserRequest;
 import com.suma.carepoint.models.auth.UserResponse;
+import com.suma.carepoint.models.auth.UserRoleRequest;
 import com.suma.carepoint.models.mapper.UserMapper;
 import com.suma.carepoint.models.utility.PageResponse;
 import com.suma.carepoint.repositories.auth.UserRepository;
@@ -33,6 +34,7 @@ public class UserServiceImpl implements UserService {
     private final StaffRepository staffRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final UserRoleService userRoleService;
 
     @Override
     public UserResponse create(UserRequest request) {
@@ -53,6 +55,8 @@ public class UserServiceImpl implements UserService {
                 .build();
         try {
             User saved = userRepository.save(user);
+            UserRoleRequest userRoleRequest = UserRoleRequest.builder().userId(saved.getUserId()).roleId(request.getRoleId()).build();
+            userRoleService.assignRole(userRoleRequest);
             log.info("User created successfully. userId={}, staffId={}",
                     saved.getUserId(), staff != null ? staff.getStaffId() : null);
             return userMapper.toResponse(saved);

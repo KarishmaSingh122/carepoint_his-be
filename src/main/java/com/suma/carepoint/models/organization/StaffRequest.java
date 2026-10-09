@@ -46,6 +46,9 @@ public class StaffRequest {
     @NotNull(message = "Department ID is required")
     private Long departmentId;
 
+    @NotNull(message = "Role is required")
+    private Long roleId;
+
     @PastOrPresent(message = "Joining date cannot be in the future")
     private LocalDate joiningDate;
 }

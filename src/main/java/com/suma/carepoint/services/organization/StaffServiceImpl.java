@@ -73,7 +73,7 @@ public class StaffServiceImpl implements StaffService {
         try {
             Staff savedStaff = staffRepository.save(staff);
 
-            UserRequest userRequest =  UserRequest.builder().staffId(savedStaff.getStaffId()).username(savedStaff.getEmail()).password(defaultPassword).build();
+            UserRequest userRequest =  UserRequest.builder().staffId(savedStaff.getStaffId()).username(savedStaff.getEmail()).password(defaultPassword).roleId(request.getRoleId()).build();
             userService.create(userRequest);
             log.info("Staff created successfully. staffId={}, employeeNo={}, departmentId={}",
                     savedStaff.getStaffId(), savedStaff.getEmployeeNo(), department.getDepartmentId());

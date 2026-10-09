@@ -1,8 +1,10 @@
 package com.suma.carepoint.services.rooms;
 import com.suma.carepoint.entities.ward.Ward;
 import com.suma.carepoint.entities.wardrooms.WardRoom;
+import com.suma.carepoint.exceptions.ResourceNotFoundException;
 import com.suma.carepoint.models.ApiResponse;
 import com.suma.carepoint.models.wardrooms.CreateRoomRequest;
+import com.suma.carepoint.models.wardrooms.RoomRequest;
 import com.suma.carepoint.models.wardrooms.RoomResponse;
 import com.suma.carepoint.repositories.ward.WardRepository;
 import com.suma.carepoint.repositories.wardroom.WardRoomRepository;
@@ -87,22 +89,24 @@ public class WardRoomServiceImpl implements WardRoomService {
         return new ApiResponse(1, "Room deleted successfully", null);}
 
     @Override
-    public ApiResponse updateRoom(WardRoom wardRoom) {
+    public ApiResponse updateRoom(Long roomId, RoomRequest wardRoom) {
+        WardRoom existingRoom = wardRoomRepository.findById(roomId)
+                .orElseThrow(() -> new ResourceNotFoundException("Room not found with id: " + roomId));
 
-        WardRoom existingRoom = wardRoomRepository.findById(wardRoom.getRoomId())
-                .orElseThrow(() -> new RuntimeException("Room not found"));
+        Ward ward = wardRepository.findById(wardRoom.getWardId())
+                .orElseThrow(() -> new ResourceNotFoundException("Ward not found with id: " + wardRoom.getWardId()));
 
         modelMapper.map(wardRoom, existingRoom);
+
+        existingRoom.setWard(ward);
 
         WardRoom updatedRoom = wardRoomRepository.save(existingRoom);
 
         RoomResponse roomResponse = modelMapper.map(updatedRoom, RoomResponse.class);
-
         roomResponse.setWardId(updatedRoom.getWard().getWardId());
 
         return new ApiResponse(1, "Room updated successfully", roomResponse);
     }
-
     @Override
     public ApiResponse getRoomByWardId(Long wardId) {
         // 1. Fetch the list of rooms or throw an exception if none are found
