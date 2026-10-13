@@ -102,7 +102,7 @@ public class DocumentServiceImpl implements DocumentService {
                 .documentType(request.getDocumentType())
                 .fileName(originalFileName).filePath(targetPath.toString())
                 .fileSize(file.getSize()).contentType(file.getContentType())
-                .storedFileName(storedFileName).verified(true)
+                .storedFileName(storedFileName).verified(false)
                 .build();
         try {
             Document saved = documentRepository.save(document);
@@ -392,7 +392,7 @@ public class DocumentServiceImpl implements DocumentService {
                         .fileSize(file.getSize())
                         .contentType(file.getContentType())
                         .storedFileName(storedFileName)
-                        .verified(true)
+                        .verified(false)
                         .build();
 
                 documentEntities.add(document);

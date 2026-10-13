@@ -4,6 +4,8 @@ import com.suma.carepoint.models.ApiResponse;
 import com.suma.carepoint.models.admission.CreateAdmissionRequest;
 import com.suma.carepoint.models.constants.ApiConstant;
 import com.suma.carepoint.services.admission.AdmissionService;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -56,6 +58,18 @@ public class AdmissionController {
     @PutMapping("/update/{admissionId}")
     public ResponseEntity<ApiResponse> updateAdmission(@PathVariable Long admissionId) {
         return ResponseEntity.ok().body(admissionService.updateAdmission(admissionId));
+    }
+
+    @GetMapping(ApiConstant.Admission.GET_BY_PATIENT_ID_OR_ABHA_ID)
+    public ResponseEntity<ApiResponse> getAllAdmissions(
+            @RequestParam(required = false) Long patientId,
+            @RequestParam(required = false) String abhaId,
+            @RequestParam(defaultValue = "0") @Min(0) int page,
+            @RequestParam(defaultValue = "20") @Min(1) @Max(100) int size) {
+
+        return ResponseEntity.ok(
+                admissionService.getAllAdmissions(patientId, abhaId, page, size)
+        );
     }
 }
 

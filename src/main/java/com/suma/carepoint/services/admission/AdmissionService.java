@@ -21,4 +21,6 @@ public interface AdmissionService {
     ApiResponse getPatientTreatmentWorkspaceByAdmissionId(Long patientId);
 
     ApiResponse searchAdmissionByKeyword(String keyword);
+
+    ApiResponse getAllAdmissions(Long patientId, String abhaId, int page, int size);
 }

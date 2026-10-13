@@ -19,6 +19,7 @@ import com.suma.carepoint.models.treatment_workspace.TreatmentWorkspaceAdmission
 import com.suma.carepoint.models.treatment_workspace.TreatmentWorkspacePatientResponse;
 import com.suma.carepoint.models.treatment_workspace.TreatmentWorkspaceResponse;
 import com.suma.carepoint.models.treatment_workspace.TreatmentWorkspaceTreatmentResponse;
+import com.suma.carepoint.models.utility.PageResponse;
 import com.suma.carepoint.repositories.admisssion.AdmissionRepository;
 import com.suma.carepoint.repositories.bed_assignment.BedAssignmentRepository;
 import com.suma.carepoint.repositories.organization.StaffRepository;
@@ -31,6 +32,10 @@ import com.suma.carepoint.services.procedure.ProcedureService;
 import com.suma.carepoint.services.visit.VisitService;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -751,6 +756,84 @@ public class AdmissionServiceImpl implements AdmissionService {
                     "Unable to search admissions",
                     null
             );
+        }
+    }
+
+    @Override
+    public ApiResponse getAllAdmissions(Long patientId, String abhaId, int page, int size) {
+        try {
+            if (patientId == null && (abhaId == null || abhaId.isBlank())) {
+                return new ApiResponse(2, "Patient ID or ABHA ID is required", null);
+            }
+
+            if (patientId != null && abhaId != null && !abhaId.isBlank()) {
+                return new ApiResponse(2, "Provide either patient ID or ABHA ID, not both", null);
+            }
+
+            Pageable pageable = PageRequest.of(
+                    page,
+                    size,
+                    Sort.by(Sort.Direction.DESC, "admissionDate")
+            );
+
+            Page<Admission> admissionPage;
+
+            if (patientId != null) {
+                admissionPage = admissionRepository.findByPatient_PatientId(patientId, pageable);
+            } else {
+                admissionPage = admissionRepository.findByPatient_AbhaId(abhaId, pageable);
+            }
+
+            List<AdmissionResponse> admissionResponses = admissionPage.getContent()
+                    .stream()
+                    .map(admission -> {
+                        AdmissionResponse response = new AdmissionResponse();
+
+                        response.setAdmissionId(admission.getAdmissionId());
+                        response.setAdmissionNumber(admission.getAdmissionNumber());
+
+                        if (admission.getPatient() != null) {
+                            response.setPatientId(admission.getPatient().getPatientId());
+                            response.setPatientName(
+                                    admission.getPatient().getFirstName() + " " +
+                                            admission.getPatient().getLastName()
+                            );
+                        }
+
+                        if (admission.getAdmittingDoctor() != null) {
+                            response.setAdmittingDoctorId(
+                                    admission.getAdmittingDoctor().getStaffId()
+                            );
+                            response.setAdmittingDoctorName(
+                                    admission.getAdmittingDoctor().getFirstName() + " " +
+                                            admission.getAdmittingDoctor().getLastName()
+                            );
+                        }
+
+                        response.setAdmissionDate(admission.getAdmissionDate());
+                        response.setAdmissionType(admission.getAdmissionType());
+                        response.setStatus(admission.getStatus());
+                        response.setReason(admission.getReason());
+
+                        return response;
+                    })
+                    .toList();
+
+            PageResponse pageResponse = new PageResponse(
+                    admissionResponses,
+                    admissionPage.getNumber(),
+                    admissionPage.getSize(),
+                    admissionPage.getTotalElements(),
+                    admissionPage.getTotalPages(),
+                    admissionPage.isFirst(),
+                    admissionPage.isLast()
+            );
+
+            return new ApiResponse(1, "", pageResponse);
+
+        } catch (Exception e) {
+            log.error("Error occurred while getting admissions: {}", e.getMessage(), e);
+            return new ApiResponse(2, "Failed to retrieve admissions", null);
         }
     }
 

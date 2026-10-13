@@ -86,6 +86,7 @@ public class ApiConstant {
         public static final String DELETE = "/delete";
         public static final String UPDATE = "/update";
         public static final String PATIENT_SEARCH ="/search";
+        public static final String GET_BY_PATIENT_ID_OR_ABHA_ID = "";
 
     }
 
