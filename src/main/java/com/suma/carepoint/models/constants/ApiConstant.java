@@ -333,4 +333,10 @@ public class ApiConstant {
 
         public static final String DELETE = "/allergy/delete/{allergyId}";
     }
+
+    public static class Auth {
+        public static final String BASE = "/api/auth";
+        public static final String LOGIN = "/login";
+        public static final String LOGOUT="/logout";
+    }
 }
