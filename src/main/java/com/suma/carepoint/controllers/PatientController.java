@@ -4,6 +4,7 @@ import com.suma.carepoint.models.ApiResponse;
 import com.suma.carepoint.models.constants.ApiConstant;
 import com.suma.carepoint.models.patient.CreatePatientRequest;
 import com.suma.carepoint.models.utility.PageResponse;
+import com.suma.carepoint.security.annotation.HasPermissions;
 import com.suma.carepoint.services.patient.PatientService;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -12,6 +13,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,11 +23,13 @@ public class PatientController {
     @Autowired
     private PatientService patientService;
 
+//    @HasPermissions("PATIENT_READ")
     @GetMapping(ApiConstant.Patient.GET_BY_PATIENT_ID)
     public ResponseEntity<ApiResponse> getPatientByPatientId(@RequestParam(name = "patientId") Long patientId) {
         return ResponseEntity.ok().body(patientService.getPatientByPatientId(patientId));
     }
 
+//    @PreAuthorize("hasRole('DOCTOR')")
     @GetMapping(ApiConstant.Patient.GET_BY_ABHA_ID)
     public ResponseEntity<ApiResponse> getPatientByAbhaId(@RequestParam String abhaId) {
         return ResponseEntity.ok().body(patientService.getPatientByAbhaId(abhaId));

@@ -338,5 +338,15 @@ public class ApiConstant {
         public static final String BASE = "/api/auth";
         public static final String LOGIN = "/login";
         public static final String LOGOUT="/logout";
+        public static final String REFRESH="/refresh";
+        public static final String FORGOT_PASSWORD = "/forgot-password";
+    }
+
+    public static class Security {
+        public static final String ROLE_ = "ROLE_";
+        public static final String REFRESH_HASH_ALGORITHM = "SHA-256";
+        public static final String LOGOUT="/logout";
+        public static final String REFRESH="/refresh";
+        public static final String FORGOT_PASSWORD = "/forgot-password";
     }
 }

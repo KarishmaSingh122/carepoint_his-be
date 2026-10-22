@@ -1,43 +1,94 @@
+
 package com.suma.carepoint.services.auth;
 
-import com.suma.carepoint.entities.auth.User;
 import com.suma.carepoint.models.auth.LoginRequest;
-import com.suma.carepoint.models.auth.LoginResponse;
-import com.suma.carepoint.repositories.auth.UserRepository;
-import com.suma.carepoint.security.JwtService;
+import com.suma.carepoint.security.UserPrincipal;
+import com.suma.carepoint.security.jwt.AuthCookieService;
+import com.suma.carepoint.security.jwt.TokenService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
+    private final TokenService tokenService;
+    private final AuthCookieService authCookieService;
 
-    public LoginResponse login(LoginRequest request) {
+    public AuthResult login(
+            LoginRequest request,
+            HttpServletResponse response) {
 
-        User user = userRepository
-                .findByUsernameIgnoreCase(request.getUsername())
-                .orElseThrow(() ->
-                        new BadCredentialsException("Invalid username or password"));
+        Authentication authentication =
+                authenticationManager.authenticate(
+                        UsernamePasswordAuthenticationToken.unauthenticated(
+                                request.username(),
+                                request.password()
+                        )
+                );
 
-        if (!user.isActive()) {
-            throw new BadCredentialsException("User account is inactive");
-        }
+        UserPrincipal principal =
+                (UserPrincipal) authentication.getPrincipal();
 
-        if (!passwordEncoder.matches(
-                request.getPassword(),
-                user.getPasswordHash())) {
-            throw new BadCredentialsException("Invalid username or password");
-        }
+        String accessToken =
+                tokenService.issueAccessToken(principal);
 
-        String token = jwtService.generateToken(user.getUsername());
+        TokenService.IssuedRefreshToken refresh =
+                tokenService.createRefreshToken(principal);
 
-        return new LoginResponse(token, "Bearer");
+        authCookieService.writeTokens(
+                response,
+                accessToken,
+                tokenService.getAccessTokenTtl(),
+                refresh.value(),
+                tokenService.getRefreshTokenTtl()
+        );
+
+        return new AuthResult(true);
     }
-}
 
+    public AuthResult refresh(
+            HttpServletRequest request,
+            HttpServletResponse response) {
+
+        String rawRefreshToken =
+                authCookieService.readRefreshToken(request);
+
+        TokenService.RotatedRefreshToken rotated =
+                tokenService.rotateRefreshToken(rawRefreshToken);
+
+        String accessToken =
+                tokenService.issueAccessToken(rotated.principal());
+
+        authCookieService.writeTokens(
+                response,
+                accessToken,
+                tokenService.getAccessTokenTtl(),
+                rotated.value(),
+                tokenService.getRefreshTokenTtl()
+        );
+
+        return new AuthResult(true);
+    }
+
+    public AuthResult logout(
+            HttpServletRequest request,
+            HttpServletResponse response) {
+
+        String rawRefreshToken =
+                authCookieService.readRefreshToken(request);
+
+        tokenService.revokeRefreshToken(rawRefreshToken);
+        authCookieService.clearTokens(response);
+
+        return new AuthResult(true);
+    }
+
+    public record AuthResult(boolean authenticated) {}
+}

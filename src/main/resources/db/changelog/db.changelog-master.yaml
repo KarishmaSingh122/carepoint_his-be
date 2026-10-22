@@ -105,4 +105,10 @@ databaseChangeLog:
       file: db/changelog/v1/034-update-visit.sql
 
   - include:
+      file: db/changelog/v1/035-create-refresh-token.sql
+
+  - include:
       file: db/changelog/v1/initial-data-insert/001-role-insert.sql
+
+  - include:
+      file: db/changelog/v1/initial-data-insert/002-permission-insert.sql
