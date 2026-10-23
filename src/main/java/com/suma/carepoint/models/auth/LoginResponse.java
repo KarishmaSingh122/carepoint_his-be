@@ -1,15 +1,15 @@
 package com.suma.carepoint.models.auth;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
+import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class LoginResponse {
-    private String token;
-    private String tokenType;
+    private List<String> roles;
+//    private String email;
 }
