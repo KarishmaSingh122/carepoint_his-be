@@ -349,4 +349,12 @@ public class ApiConstant {
         public static final String REFRESH="/refresh";
         public static final String FORGOT_PASSWORD = "/forgot-password";
     }
+
+    public static class OneHcxAuth {
+        public static final String BASE = "/api/onehcx/auth";
+        public static final String REGISTER_ACCOUNT = "/accounts";
+        public static final String PROFILE="/profile/{userId}";
+        public static final String REFRESH="/refresh";
+        public static final String FORGOT_PASSWORD = "/forgot-password";
+    }
 }

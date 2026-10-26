@@ -3,6 +3,7 @@ package com.suma.carepoint.services.auth;
 
 import com.suma.carepoint.models.auth.LoginRequest;
 import com.suma.carepoint.models.auth.LoginResponse;
+import com.suma.carepoint.services.onehcx.auth.OneHcxAuthService;
 import com.suma.carepoint.security.UserPrincipal;
 import com.suma.carepoint.security.jwt.AuthCookieService;
 import com.suma.carepoint.security.jwt.TokenService;
@@ -16,7 +17,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static com.suma.carepoint.models.constants.ApiConstant.Security.ROLE_;
 
@@ -27,6 +27,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
     private final AuthCookieService authCookieService;
+    private final OneHcxAuthService hcxAuthService;
 
     public LoginResponse login(LoginRequest request, HttpServletResponse response) {
 
@@ -69,6 +70,7 @@ public class AuthService {
     }
 
     public AuthResult logout(HttpServletRequest request, HttpServletResponse response) {
+        hcxAuthService.logout();
         String rawRefreshToken = authCookieService.readRefreshToken(request);
         tokenService.revokeRefreshToken(rawRefreshToken);
         authCookieService.clearTokens(response);

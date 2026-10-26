@@ -30,6 +30,11 @@ public class ApiResponse {
         this.message = message;
     }
 
+    public ApiResponse(int status, Object data) {
+        this.status = status;
+        this.data = data;
+    }
+
     public ApiResponse(int status, String message, Object data) {
         this.status = status;
         this.message = message;

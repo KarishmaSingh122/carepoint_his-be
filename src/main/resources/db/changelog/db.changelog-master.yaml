@@ -108,6 +108,9 @@ databaseChangeLog:
       file: db/changelog/v1/035-create-refresh-token.sql
 
   - include:
+      file: db/changelog/v1/036-create-onehcx-account.sql
+
+  - include:
       file: db/changelog/v1/initial-data-insert/001-role-insert.sql
 
   - include:
