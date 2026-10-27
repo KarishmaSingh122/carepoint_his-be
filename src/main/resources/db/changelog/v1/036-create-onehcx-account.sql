@@ -19,7 +19,7 @@ CREATE TABLE onehcx_account
 
     CONSTRAINT uk_onehcx_account_username UNIQUE (username),
     CONSTRAINT fk_onehcx_account_staff
-        FOREIGN KEY (staff_id) REFERENCES staff(id)
+        FOREIGN KEY (staff_id) REFERENCES staff(staff_id)
 );
 
 CREATE INDEX idx_onehcx_account_token_expiry
