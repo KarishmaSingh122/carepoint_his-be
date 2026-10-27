@@ -1,5 +1,4 @@
 package com.suma.carepoint.controllers.auth;
-
 import com.suma.carepoint.models.ApiResponse;
 import com.suma.carepoint.models.auth.LoginRequest;
 import com.suma.carepoint.services.auth.AuthService;
@@ -10,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.suma.carepoint.security.UserPrincipal;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import static com.suma.carepoint.models.constants.ApiConstant.Auth.*;
 
@@ -60,6 +61,14 @@ public class AuthController {
                         "Logout successful.",
                         authService.logout(request, response))
                 );
+    }
+
+    @GetMapping(ME)
+    public ResponseEntity<ApiResponse> me(@AuthenticationPrincipal UserPrincipal principal) {
+
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.noStore())
+                .body(new ApiResponse(1, "", authService.me(principal)));
     }
 }
 

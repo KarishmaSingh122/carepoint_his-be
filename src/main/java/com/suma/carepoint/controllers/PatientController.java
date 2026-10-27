@@ -23,18 +23,19 @@ public class PatientController {
     @Autowired
     private PatientService patientService;
 
-//    @HasPermissions("PATIENT_READ")
+    @HasPermissions("PATIENT_READ")
     @GetMapping(ApiConstant.Patient.GET_BY_PATIENT_ID)
     public ResponseEntity<ApiResponse> getPatientByPatientId(@RequestParam(name = "patientId") Long patientId) {
         return ResponseEntity.ok().body(patientService.getPatientByPatientId(patientId));
     }
 
-//    @PreAuthorize("hasRole('DOCTOR')")
+  @PreAuthorize("hasRole('DOCTOR')")
+  @HasPermissions("PATIENT_READ")
     @GetMapping(ApiConstant.Patient.GET_BY_ABHA_ID)
     public ResponseEntity<ApiResponse> getPatientByAbhaId(@RequestParam String abhaId) {
         return ResponseEntity.ok().body(patientService.getPatientByAbhaId(abhaId));
     }
-
+    @HasPermissions("PATIENT_READ")
     @GetMapping(ApiConstant.Patient.PATIENT_SEARCH)
     public ResponseEntity<ApiResponse> searchPatientByKeyword(@RequestParam(name="keyword") String keyword) {
         return ResponseEntity.ok().body(patientService.searchPatientByKeyword(keyword));
@@ -50,8 +51,8 @@ public class PatientController {
 //        files.remove("metadata");
 //        return ResponseEntity.ok().body(patientService.createPatients(createPatientRequest, files));
 //    }
-
-    @PostMapping(ApiConstant.Patient.CREATE)
+  @HasPermissions("PATIENT_CREATE")
+  @PostMapping(ApiConstant.Patient.CREATE)
     public ResponseEntity<ApiResponse> createPatients(
             @RequestBody CreatePatientRequest createPatientRequest
     ) {
@@ -59,7 +60,7 @@ public class PatientController {
 //        files.remove("metadata");
         return ResponseEntity.ok().body(patientService.createPatients(createPatientRequest, null));
     }
-
+    @HasPermissions("PATIENT_UPDATE")
     @PutMapping(ApiConstant.Patient.UPDATE+"/{patientId}")
     public ResponseEntity<ApiResponse> updatePatient(
             @PathVariable (name = "patientId") Long patientId,
@@ -67,14 +68,14 @@ public class PatientController {
 
         return ResponseEntity.ok().body(patientService.updatePatient(patientId, request));
     }
-
+    @HasPermissions("PATIENT_DELETE")
     @DeleteMapping(ApiConstant.Patient.DELETE)
     public ResponseEntity<ApiResponse> DeletePatientByPatientId(
             @RequestParam(name = "patientId") Long patientId
     ) {
         return ResponseEntity.ok().body(patientService.DeletePatientByPatientId(patientId));
     }
-
+    @HasPermissions("PATIENT_READ")
     @GetMapping(ApiConstant.Patient.GET)
     public ResponseEntity<ApiResponse> getAllPatients(
             @RequestParam(required = false) Boolean active,
@@ -85,7 +86,7 @@ public class PatientController {
         ApiResponse apiResponse = new ApiResponse(1, "", response);
         return ResponseEntity.ok().body(apiResponse);
     }
-
+    @HasPermissions("PATIENT_READ")
     @GetMapping(ApiConstant.Patient.EXISTS)
     public ResponseEntity<ApiResponse> getPatientStatusIfExists(
             @RequestParam(name="abhaId")

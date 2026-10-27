@@ -320,8 +320,10 @@ public class ApiConstant {
 
     public static class Allergy {
 
+
         private Allergy() {
         }
+
 
         public static final String CREATE = "/allergy/create";
 
@@ -340,6 +342,7 @@ public class ApiConstant {
         public static final String LOGOUT="/logout";
         public static final String REFRESH="/refresh";
         public static final String FORGOT_PASSWORD = "/forgot-password";
+        public static final String ME = "/me";
     }
 
     public static class Security {

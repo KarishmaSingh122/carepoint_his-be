@@ -4,6 +4,7 @@ package com.suma.carepoint.services.auth;
 import com.suma.carepoint.models.auth.LoginRequest;
 import com.suma.carepoint.models.auth.LoginResponse;
 import com.suma.carepoint.services.onehcx.auth.OneHcxAuthService;
+import com.suma.carepoint.repositories.auth.UserRepository;
 import com.suma.carepoint.security.UserPrincipal;
 import com.suma.carepoint.security.jwt.AuthCookieService;
 import com.suma.carepoint.security.jwt.TokenService;
@@ -17,6 +18,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.suma.carepoint.models.constants.ApiConstant.Security.ROLE_;
 
@@ -29,6 +31,7 @@ public class AuthService {
     private final AuthCookieService authCookieService;
     private final OneHcxAuthService hcxAuthService;
 
+    private final UserRepository userRepository;
     public LoginResponse login(LoginRequest request, HttpServletResponse response) {
 
         Authentication authentication =
@@ -79,13 +82,21 @@ public class AuthService {
 
     public record AuthResult(boolean authenticated) {}
 
-    private static LoginResponse buildLoginResponse(UserPrincipal principal) {
+    private LoginResponse buildLoginResponse(UserPrincipal principal) {
         return LoginResponse.builder()
-                .roles(principal.getAuthorities().stream()
-                        .map(GrantedAuthority::getAuthority)
-                        .filter(Objects::nonNull)
-                        .filter(authority -> authority.startsWith(ROLE_))
-                        .map(authority -> authority.substring(ROLE_.length()))
-                        .distinct().toList()).build();
+                .username(principal.getUsername())
+                .roles(userRepository.findActiveRoleNames(principal.userId()).stream()
+                        .map(String::toUpperCase)
+                        .sorted()
+                        .toList())
+                .permissions(userRepository.findActivePermissionNames(principal.userId()).stream()
+                        .sorted()
+                        .toList())
+                .build();
+    }
+
+    public LoginResponse me(UserPrincipal principal) {
+
+        return buildLoginResponse(principal);
     }
 }

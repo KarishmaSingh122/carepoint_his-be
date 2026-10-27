@@ -10,6 +10,9 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class LoginResponse {
+    private String username;
+    /** Role names without the ROLE_ prefix, e.g. DOCTOR. */
     private List<String> roles;
-//    private String email;
+    /** Permission names, e.g. PATIENT_READ. */
+    private List<String> permissions;
 }
