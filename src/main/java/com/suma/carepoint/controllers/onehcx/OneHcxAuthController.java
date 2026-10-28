@@ -4,6 +4,7 @@ import com.suma.carepoint.models.ApiResponse;
 import com.suma.carepoint.services.onehcx.auth.OneHcxAuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import static com.suma.carepoint.models.constants.ApiConstant.OneHcxAuth.*;
@@ -15,7 +16,7 @@ public class OneHcxAuthController {
 
     private final OneHcxAuthService authService;
 
-
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @PostMapping(REGISTER_ACCOUNT)
     public ResponseEntity<ApiResponse> configureAccount(@RequestBody ConfigureAccountRequest request) {
 

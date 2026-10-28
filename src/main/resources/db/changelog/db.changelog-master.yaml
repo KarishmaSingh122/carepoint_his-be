@@ -117,5 +117,8 @@ databaseChangeLog:
       file: db/changelog/v1/initial-data-insert/002-permission-insert.sql
 
   - include:
+      file: db/changelog/v1/initial-data-insert/003-user-insert.sql
+
+  - include:
       file: db/changelog/v1/037-role-permission-insert.sql
 
