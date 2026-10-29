@@ -14,4 +14,10 @@ public class OneHcxClientConstant {
         public static final String USER_DETAILS="/user-details";
     }
 
+
+    public static class Abdm {
+        public static final String BASE = "/service/abdm/v3/hmis/healthId/profile/login";
+        public static final String GENERATE_OTP = "/hmis-generateOtp";
+        public static final String VERIFY_OTP = "/hmis-validateOtp";
+    }
 }

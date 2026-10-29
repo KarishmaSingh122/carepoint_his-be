@@ -33,7 +33,8 @@ public class ApiConstant {
         public static final String CREATE ="/create";
         public static final String UPDATE ="/update";
         public static final String DELETE ="/delete";
-
+        public static final String INITIATE_ABHA_VERIFICATION = "/abha/initiate-verification";
+        public static final String VERIFY_ABHA_OTP = "/abha/verify-otp";
     }
 
     public static class Bill{
