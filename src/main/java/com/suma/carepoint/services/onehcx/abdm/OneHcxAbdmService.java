@@ -1,12 +1,8 @@
 package com.suma.carepoint.services.onehcx.abdm;
-
-
 import com.suma.carepoint.models.onehcx.OneHcxGenerateOTPResponse;
 import com.suma.carepoint.services.onehcx.auth.OneHcxAuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import tools.jackson.databind.JsonNode;
-
 import java.util.Map;
 
 @Service
@@ -25,7 +21,6 @@ public class OneHcxAbdmService {
                 )
         );
 
-        System.out.println("OneHCX Generate OTP response: " + response);
         return response;
     }
 
@@ -37,3 +32,4 @@ public class OneHcxAbdmService {
     }
 
 }
+
