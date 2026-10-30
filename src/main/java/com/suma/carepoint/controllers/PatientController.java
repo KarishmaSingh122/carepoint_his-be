@@ -7,17 +7,16 @@ import com.suma.carepoint.models.utility.PageResponse;
 import com.suma.carepoint.security.annotation.HasPermissions;
 import com.suma.carepoint.services.onehcx.abdm.OneHcxAbdmService;
 import com.suma.carepoint.services.patient.PatientService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Map;
 
@@ -25,6 +24,7 @@ import java.util.Map;
 @RequestMapping(ApiConstant.Controller.HMIS)
 @AllArgsConstructor
 public class PatientController {
+
     @Autowired
     private PatientService patientService;
 
@@ -32,7 +32,8 @@ public class PatientController {
 
     @HasPermissions("PATIENT_READ")
     @GetMapping(ApiConstant.Patient.GET_BY_PATIENT_ID)
-    public ResponseEntity<ApiResponse> getPatientByPatientId(@RequestParam(name = "patientId") Long patientId) {
+    public ResponseEntity<ApiResponse> getPatientByPatientId(
+            @RequestParam(name = "patientId") Long patientId) {
         return ResponseEntity.ok().body(patientService.getPatientByPatientId(patientId));
     }
 
@@ -40,7 +41,7 @@ public class PatientController {
     @HasPermissions("PATIENT_READ")
     @GetMapping(ApiConstant.Patient.GET_BY_ABHA_ID)
     public ResponseEntity<ApiResponse> getPatientByAbhaId(@RequestParam String abhaId) {
-        return ResponseEntity.ok().body(patientService.getPatientByAbhaId(abhaId));
+        return ResponseEntity.ok(patientService.getPatientByAbhaId(abhaId));
     }
 
     @HasPermissions("PATIENT_READ")
@@ -49,41 +50,28 @@ public class PatientController {
         return ResponseEntity.ok().body(patientService.searchPatientByKeyword(keyword));
     }
 
-
-    //    @PostMapping(ApiConstant.Patient.CREATE)
-//    public ResponseEntity<ApiResponse> createPatients(
-//            @RequestPart("metadata") CreatePatientRequest createPatientRequest,
-//            MultipartHttpServletRequest multipartHttpServletRequest
-//    ) {
-//        Map<String, MultipartFile> files = multipartHttpServletRequest.getFileMap();
-//        files.remove("metadata");
-//        return ResponseEntity.ok().body(patientService.createPatients(createPatientRequest, files));
-//    }
     @HasPermissions("PATIENT_CREATE")
     @PostMapping(ApiConstant.Patient.CREATE)
-    public ResponseEntity<ApiResponse> createPatients(
-            @RequestBody CreatePatientRequest createPatientRequest
-    ) {
-//        Map<String, MultipartFile> files = multipartHttpServletRequest.getFileMap();
-//        files.remove("metadata");
-        return ResponseEntity.ok().body(patientService.createPatients(createPatientRequest, null));
+    public ResponseEntity<ApiResponse> createPatient(
+            @Valid @RequestBody CreatePatientRequest request) {
+        return ResponseEntity.ok(patientService.createPatients(request, null));
     }
 
     @HasPermissions("PATIENT_UPDATE")
-    @PutMapping(ApiConstant.Patient.UPDATE + "/{patientId}")
+    @PutMapping(ApiConstant.Patient.UPDATE)
     public ResponseEntity<ApiResponse> updatePatient(
             @PathVariable(name = "patientId") Long patientId,
             @RequestBody CreatePatientRequest request) {
 
-        return ResponseEntity.ok().body(patientService.updatePatient(patientId, request));
+        return ResponseEntity.ok(patientService.updatePatient(patientId, request));
     }
 
     @HasPermissions("PATIENT_DELETE")
     @DeleteMapping(ApiConstant.Patient.DELETE)
-    public ResponseEntity<ApiResponse> DeletePatientByPatientId(
-            @RequestParam(name = "patientId") Long patientId
-    ) {
-        return ResponseEntity.ok().body(patientService.DeletePatientByPatientId(patientId));
+    public ResponseEntity<ApiResponse> deletePatientByPatientId(
+            @RequestParam(name = "patientId") Long patientId) {
+
+        return ResponseEntity.ok(patientService.DeletePatientByPatientId(patientId));
     }
 
     @HasPermissions("PATIENT_READ")
@@ -98,6 +86,7 @@ public class PatientController {
         return ResponseEntity.ok().body(apiResponse);
     }
 
+
     @HasPermissions("PATIENT_READ")
     @GetMapping(ApiConstant.Patient.EXISTS)
     public ResponseEntity<ApiResponse> getPatientStatusIfExists(
@@ -110,7 +99,6 @@ public class PatientController {
 
     @PostMapping(ApiConstant.Patient.INITIATE_ABHA_VERIFICATION)
     public ResponseEntity<?> initiateAbhaVerification(@RequestBody Map<String, String> request) {
-
         String idNumber = request.get("idNumber");
         if (idNumber == null || idNumber.isBlank()) {
             return ResponseEntity.badRequest()

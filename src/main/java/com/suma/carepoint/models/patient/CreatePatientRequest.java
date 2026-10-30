@@ -1,5 +1,16 @@
 package com.suma.carepoint.models.patient;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.suma.carepoint.entities.patient.Address;
+import com.suma.carepoint.entities.patient.ContactPerson;
+import com.suma.carepoint.entities.patient.Gender;
+import com.suma.carepoint.entities.patient.Subscriber;
+import com.suma.carepoint.models.constants.ApiConstant;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -11,31 +22,41 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class CreatePatientRequest {
 
-    private String abhaId;
+    @Pattern(regexp = "^[0-9]{14}$", message = "ABHA number must contain exactly 14 digits")
+    @NotBlank(message = "ABHA number required.")
+    private String abhaNumber;
 
-    private String firstName;
+    @Size(max = 200)
+    private String patientName;
 
-    private String lastName;
+    @PastOrPresent(message = "Date of birth cannot be in the future")
+    @JsonFormat(pattern = ApiConstant.DateTime.DATE_DD_MM_YYYY)
+    private LocalDate patientDob;
 
-    private LocalDate dateOfBirth;
+    @Size(max = 20)
+    private String patientMob;
 
-    private String gender;
+    private Gender gender;
 
-    private String bloodGroup;
+    @Size(max = 50)
+    private String relation;
 
-    private String phone;
+    @Size(max = 50)
+    private String patientMrNumber;
 
-    private String email;
+    private Boolean isCommAddressSameAsCardAddress;
 
-    private String address;
+    private Boolean isChildRegistration;
 
-    private String city;
+    @Valid
+    private Address patientAddress;
 
-    private String state;
+    @Valid
+    private Address patientCommAddress;
 
-    private String pincode;
+    @Valid
+    private ContactPerson contactPerson;
 
-    private String emergencyContactName;
-
-    private String emergencyContactPhone;
+    @Valid
+    private Subscriber subscriber;
 }

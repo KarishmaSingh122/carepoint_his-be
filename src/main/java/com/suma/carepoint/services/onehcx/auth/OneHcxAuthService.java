@@ -12,6 +12,7 @@ import com.suma.carepoint.models.auth.LoginRequest;
 import com.suma.carepoint.models.onehcx.OneHcxLoginResponse;
 import com.suma.carepoint.repositories.onehcx.OneHcxAccountRepository;
 import com.suma.carepoint.repositories.organization.StaffRepository;
+import com.suma.carepoint.security.CurrentUserService;
 import com.suma.carepoint.security.UserPrincipal;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,7 @@ public class OneHcxAuthService {
     private final CredentialEncryptionService encryptionService;
     private final OneHcxAuthClient hcxClient;
     private final StaffRepository staffRepository;
+    private final CurrentUserService currentUserService;
 
 
     @Transactional
@@ -62,24 +64,10 @@ public class OneHcxAuthService {
         return repository.save(account).getId();
     }
 
-    private static UserPrincipal getActiveContext() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null
-                || !authentication.isAuthenticated()
-                || !(authentication.getPrincipal() instanceof UserPrincipal principal)) {
-            log.debug("No authenticated user; skipping authentication");
-            throw new UnauthorizedAccessException("No authenticated user!");
-        }
-        return (UserPrincipal) authentication.getPrincipal();
-    }
 
     @Transactional
     public void login() {
-        UserPrincipal principal = getActiveContext();
-        if (principal == null) return;
-
-        long accountId = principal.userId();
+        long accountId = currentUserService.getCurrentUserId();
         OneHcxAccount account = repository.findByStaffId(accountId)
                 .orElseThrow(() -> new OneHcxAuthenticationException("OneHcx account not found"));
         String password = decryptPassword(account);
@@ -90,10 +78,7 @@ public class OneHcxAuthService {
 
     @Transactional
     public String getValidToken() {
-
-        UserPrincipal principal = getActiveContext();
-        long accountId = principal.userId();
-
+        long accountId = currentUserService.getCurrentUserId();
         OneHcxAccount account = repository.findByStaffId(accountId)
                 .orElseThrow(() -> new OneHcxAuthenticationException("OneHcx account not found"));
 
@@ -151,10 +136,7 @@ public class OneHcxAuthService {
 
     @Transactional
     public void logout() {
-        UserPrincipal principal = getActiveContext();
-        if (principal == null) return;
-
-        long accountId = principal.userId();
+        long accountId = currentUserService.getCurrentUserId();
         OneHcxAccount account = repository.findByStaffId(accountId)
                 .orElseThrow(() -> new OneHcxAuthenticationException("OneHcx account not found"));
 

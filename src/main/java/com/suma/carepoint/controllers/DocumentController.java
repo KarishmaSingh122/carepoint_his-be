@@ -37,10 +37,9 @@ public class DocumentController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse> upload(
             @RequestParam @Min(1) Long patientId,
-            @RequestParam @Min(1) Long uploadedBy,
             @Valid @ModelAttribute DocumentRequest request,
             @RequestPart("file") MultipartFile file) {
-        DocumentResponse response = documentService.upload(patientId, uploadedBy, request, file);
+        DocumentResponse response = documentService.upload(patientId, request, file);
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse(1, "", response));
     }
 
@@ -62,7 +61,6 @@ public class DocumentController {
    @PostMapping(value = ApiConstant.Document.BULK_UPLOADS, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
    public ResponseEntity<ApiResponse> uploadDocuments(
            @RequestParam @Min(1) Long patientId,
-           @RequestParam @Min(1) Long uploadedBy,
            @RequestParam(required = false) @Min(1) Long visitId,
            @RequestParam(required = false) @Min(1) Long admissionId,
            @RequestPart("documents") String documentsJson,
@@ -74,7 +72,7 @@ public class DocumentController {
        );
 
        List<DocumentResponse> response =
-               documentService.uploadDocuments(patientId, uploadedBy, visitId, admissionId, documents, files);
+               documentService.uploadDocuments(patientId, visitId, admissionId, documents, files);
 
        return ResponseEntity.status(HttpStatus.CREATED)
                .body(new ApiResponse(

@@ -1,14 +1,17 @@
 package com.suma.carepoint.services.patient;
 
-import com.suma.carepoint.entities.patient.Gender;
 import com.suma.carepoint.entities.patient.Patient;
+import com.suma.carepoint.exceptions.BadRequestException;
+import com.suma.carepoint.exceptions.ConflictException;
 import com.suma.carepoint.exceptions.ResourceNotFoundException;
 import com.suma.carepoint.models.ApiResponse;
 import com.suma.carepoint.models.patient.CreatePatientRequest;
 import com.suma.carepoint.models.patient.PatientResponse;
 import com.suma.carepoint.models.utility.PageResponse;
 import com.suma.carepoint.repositories.patient.PatientRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +20,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -24,173 +29,86 @@ import java.util.stream.Collectors;
 
 import static com.suma.carepoint.models.utility.PageResponse.buildPageResponse;
 import static com.suma.carepoint.models.utility.PageResponse.validatePagination;
-
-@Slf4j
 @Service
-public class PatientServiceImpl implements PatientService{
+@RequiredArgsConstructor
+@Slf4j
+public class PatientServiceImpl implements PatientService {
 
-    private  final PatientRepository patientRepository;
-
+    private final PatientRepository patientRepository;
     private final ModelMapper modelMapper;
-
-    public PatientServiceImpl( PatientRepository patientRepository, ModelMapper modelMapper){
-        this.patientRepository= patientRepository;
-        this.modelMapper = modelMapper;
-    }
 
     @Override
     public ApiResponse getPatientByPatientId(Long patientId) {
-        PatientResponse patientResponse = null;
-        try {
-            Patient patient = patientRepository.findById(patientId).orElseThrow(() -> new RuntimeException("Patient not found"));
-            patientResponse = modelMapper.map(patient,PatientResponse.class);
-            ApiResponse response = new ApiResponse(1, "", List.of(patientResponse));
-            return response ;
-        } catch (Exception e) {
-            log.error("Error occurred in getPatients by abhaId: {}, error: {}", patientId, e.getMessage());
-            return new ApiResponse(2, "", patientResponse
-            );
-        }
+
+        Patient patient = findPatient(patientId);
+        PatientResponse response = modelMapper.map(patient, PatientResponse.class);
+        return new ApiResponse(1, "Patients found successfully", response);
     }
 
     @Override
     public ApiResponse getPatientByAbhaId(String abhaId) {
-        PatientResponse patientResponse = null;
-        try {
-            Patient patient = patientRepository.findByAbhaId(abhaId).orElseThrow(() -> new RuntimeException("Patient not found"));
-            patientResponse = modelMapper.map(patient,PatientResponse.class);
-            ApiResponse response = new ApiResponse(1, "", patientResponse);
-            return response ;
-        } catch (Exception e) {
-            log.error("Error occurred in getPatients by abhaId: {}, error: {}", abhaId, e.getMessage());
-            return new ApiResponse(2, "", patientResponse
-            );
-        }
+
+        Patient patient = patientRepository.findByAbhaNumber(abhaId)
+                .orElseThrow(() -> new ResourceNotFoundException("Patient not found"));
+
+        PatientResponse response = modelMapper.map(patient, PatientResponse.class);
+        return new ApiResponse(1, "Patients found successfully", response);
     }
 
     @Override
-    public ApiResponse createPatients(CreatePatientRequest createPatientRequest, Map<String, MultipartFile> files) {
+    public ApiResponse createPatients(CreatePatientRequest request, Map<String, MultipartFile> files) {
 
-        Patient patient = modelMapper.map(createPatientRequest,Patient.class);
+        validateRequest(request);
+        if (patientRepository.findByAbhaNumber(request.getAbhaNumber()).isPresent()) {
+            throw new ConflictException("Patient with ABHA number already exists");
+        }
 
-        Patient savedPatient =patientRepository.save(patient);
+        Patient patient = modelMapper.map(request, Patient.class);
+        patient.setAge(calculateAgeFromDob(patient));
+        applyAddressRule(patient);
+        Patient savedPatient = patientRepository.save(patient);
+        PatientResponse response = modelMapper.map(savedPatient, PatientResponse.class);
 
+        return new ApiResponse(1, "Patients created successfully", response);
+    }
 
-        PatientResponse patientResponse = modelMapper.map(savedPatient,PatientResponse.class);
-        ApiResponse response = new ApiResponse(1, "", patientResponse);
-        return response;
+    private static @NonNull String calculateAgeFromDob(Patient patient) {
+        LocalDate dob = patient.getPatientDob();
+        Period agePeriod = Period.between(dob, LocalDate.now());
+        String age = agePeriod.getYears() + " years "
+                + agePeriod.getMonths() + " months";
+        return age;
     }
 
     @Override
     public ApiResponse updatePatient(Long patientId, CreatePatientRequest request) {
-        PatientResponse patientResponse = null;
-        try {
-            Patient patient = patientRepository.findById(patientId).orElseThrow(() -> new RuntimeException("Patient not found"));
 
-            patient.setFirstName(request.getFirstName());
-            patient.setLastName(request.getLastName());
-            patient.setDateOfBirth(request.getDateOfBirth());
-            patient.setGender(Gender.valueOf(request.getGender()));
-            patient.setBloodGroup(request.getBloodGroup());
-            patient.setPhone(request.getPhone());
-            patient.setEmail(request.getEmail());
-            patient.setAddress(request.getAddress());
-            patient.setCity(request.getCity());
-            patient.setState(request.getState());
-            patient.setPincode(request.getPincode());
-            patient.setEmergencyContactName(request.getEmergencyContactName());
-            patient.setEmergencyContactPhone(request.getEmergencyContactPhone());
+//        validateRequest(request);
+        Patient patient = findPatient(patientId);
 
-            patient = patientRepository.save(patient);
-            patientResponse = modelMapper.map(patient,PatientResponse.class);
-            ApiResponse response = new ApiResponse(1, "", patientResponse);
-            return response ;
-        } catch (Exception e) {
-            log.error("Error occurred in update pateint  by patientId: {}, error: {}", patientId, e.getMessage());
-            return new ApiResponse(2, "", patientResponse
-            );
-        }     }
+        patientRepository.findByAbhaNumber(request.getAbhaNumber())
+                .filter(existing -> !existing.getPatientId().equals(patientId))
+                .ifPresent(existing -> {
+                    throw new ConflictException("Patient with ABHA number already exists");
+                });
+
+        modelMapper.map(request, patient);
+        applyAddressRule(patient);
+        Patient updatedPatient = patientRepository.save(patient);
+        PatientResponse response = modelMapper.map(updatedPatient, PatientResponse.class);
+
+        return new ApiResponse(1, "Patients updated successfully", response);
+    }
 
     @Override
     public ApiResponse DeletePatientByPatientId(Long patientId) {
-        PatientResponse patientResponse = null;
-        try {
-            Patient patient = patientRepository.findById(patientId).orElseThrow(() -> new RuntimeException("Patient not found"));
-            patient.setActive(false);
-            patient = patientRepository.save(patient);
-            patientResponse = modelMapper.map(patient,PatientResponse.class);
 
-            ApiResponse response = new ApiResponse(1, "", patientResponse);
-            return response ;
-        } catch (Exception e) {
-            log.error("Error occurred in getPatients by abhaId: {}, error: {}", patientId, e.getMessage());
-            return new ApiResponse(2, "", patientResponse
-            );
-        }       }
+        Patient patient = findPatient(patientId);
+        patient.setActive(false);
+        Patient updatedPatient = patientRepository.save(patient);
+        PatientResponse response = modelMapper.map(updatedPatient, PatientResponse.class);
 
-    @Override
-    public ApiResponse searchPatientByKeyword(String keyword) {
-
-        // Validate keyword
-        if (keyword == null || keyword.trim().isEmpty()) {
-            return new ApiResponse(
-                    2,
-                    "Search keyword is required",
-                    null
-            );
-        }
-
-        String searchKeyword = keyword.trim();
-
-        // Optional: prevent unnecessarily short searches
-        if (searchKeyword.length() < 2) {
-            return new ApiResponse(
-                    2,
-                    "Search keyword must contain at least 2 characters",
-                    null
-            );
-        }
-
-        try {
-
-            List<Patient> patients =
-                    patientRepository.searchByKeyword(searchKeyword);
-
-            if (patients == null || patients.isEmpty()) {
-                return new ApiResponse(
-                        1,
-                        "No patients found",
-                        Collections.emptyList()
-                );
-            }
-
-            List<PatientResponse> patientResponses = patients.stream()
-                    .map(patient ->
-                            modelMapper.map(patient, PatientResponse.class)
-                    )
-                    .toList();
-
-            return new ApiResponse(
-                    1,
-                    "Patients found successfully",
-                    patientResponses,
-                    (long)patientResponses.size()
-            );
-
-        } catch (Exception e) {
-
-            log.error(
-                    "Error while searching patients with keyword: {}",
-                    searchKeyword,
-                    e
-            );
-
-            return new ApiResponse(
-                    2,
-                    "Unable to search patients",
-                    null
-            );
-        }
+        return new ApiResponse(1, "Patients deleted successfully", response);
     }
 
     @Override
@@ -198,24 +116,92 @@ public class PatientServiceImpl implements PatientService{
 
         validatePagination(page, size);
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-
         Page<Patient> patients;
+
         if (active != null) {
             patients = patientRepository.findByActive(active, pageable);
         } else {
             patients = patientRepository.findAll(pageable);
         }
 
-        return buildPageResponse(patients, patients.getContent()
-                .stream().map(p->modelMapper.map(p, PatientResponse.class))
-                .collect(Collectors.toList()));
+        return buildPageResponse(
+                patients,
+                patients.getContent()
+                        .stream()
+                        .map(patient -> modelMapper.map(patient, PatientResponse.class))
+                        .collect(Collectors.toList())
+        );
+    }
+
+    private Patient findPatient(Long patientId) {
+        return patientRepository.findById(patientId)
+                .orElseThrow(() -> new ResourceNotFoundException("Patient not found"));
+    }
+
+    private void validateRequest(CreatePatientRequest request) {
+        if (request == null) {
+            throw new BadRequestException("Patient request is required");
+        }
+
+        if (request.getPatientAddress() == null) {
+            throw new BadRequestException("Patient address is required");
+        }
+
+        if (Boolean.FALSE.equals(request.getIsCommAddressSameAsCardAddress()) && request.getPatientCommAddress() == null) {
+            throw new BadRequestException("Communication address is required when addresses are different");
+        }
+
+        if (!request.getRelation().equalsIgnoreCase("SELF") && request.getSubscriber() == null) {
+            throw new BadRequestException("Subscriber is required when relation is " + request.getRelation());
+        }
+    }
+
+    private void applyAddressRule(Patient patient) {
+        if (Boolean.TRUE.equals(patient.getIsCommAddressSameAsCardAddress())) {
+            patient.setPatientCommAddress(null);
+        }
+    }
+
+
+    @Override
+    public ApiResponse searchPatientByKeyword(String keyword) {
+
+        // Validate keyword
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return new ApiResponse(2, "Search keyword is required", null);
+        }
+
+        String searchKeyword = keyword.trim();
+
+        // Optional: prevent unnecessarily short searches
+        if (searchKeyword.length() < 2) {
+            return new ApiResponse(2, "Search keyword must contain at least 2 characters", null);
+        }
+
+        try {
+            List<Patient> patients = patientRepository.searchByKeyword(searchKeyword);
+
+            if (patients == null || patients.isEmpty()) {
+                return new ApiResponse(1, "No patients found", Collections.emptyList());
+            }
+
+            List<PatientResponse> patientResponses = patients.stream()
+                    .map(patient -> modelMapper.map(patient, PatientResponse.class))
+                    .toList();
+
+            return new ApiResponse(1, "Patients found successfully", patientResponses, (long) patientResponses.size());
+
+        } catch (Exception e) {
+            log.error("Error while searching patients with keyword: {}", searchKeyword, e);
+            return new ApiResponse(2, "Unable to search patients", null);
+        }
     }
 
     @Override
     public ApiResponse getPatientStatusIfExists(String abhaId){
-        if (!patientRepository.existsByAbhaId(abhaId)) {
+        if (!patientRepository.existsByAbhaNumber(abhaId)) {
             return new ApiResponse(2,"Patient not found!");
         }
-        return new ApiResponse(1,"Patient found!",patientRepository.existsByAbhaIdAndActiveTrue(abhaId));
+        return new ApiResponse(1,"Patient found!",patientRepository.existsByAbhaNumberAndActiveTrue(abhaId));
     }
 }

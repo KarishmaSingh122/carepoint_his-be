@@ -4,18 +4,25 @@ import com.suma.carepoint.security.UserDetailsServiceImpl;
 import com.suma.carepoint.security.jwt.AuthCookieService;
 import com.suma.carepoint.security.jwt.CarePointJwtAuthenticationConverter;
 import lombok.RequiredArgsConstructor;
+import org.aopalliance.intercept.MethodInvocation;
+import org.springframework.aop.Advisor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.authorization.AuthorizationDecision;
+import org.springframework.security.authorization.AuthorizationManager;
+import org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor;
+import org.springframework.security.authorization.method.PreAuthorizeAuthorizationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -28,10 +35,11 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import static com.suma.carepoint.models.constants.ApiConstant.Auth.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
+@EnableMethodSecurity(prePostEnabled = false)
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -139,4 +147,25 @@ public class SecurityConfig {
     @Bean
     AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
-    }}
+    }
+
+    @Bean
+    static Advisor preAuthorizeAdvisor() {
+        PreAuthorizeAuthorizationManager delegate = new PreAuthorizeAuthorizationManager();
+
+        AuthorizationManager<MethodInvocation> manager = (authenticationSupplier, invocation) -> {
+            Authentication authentication = authenticationSupplier.get();
+            boolean isSuperAdmin = authentication != null
+                    && authentication.isAuthenticated()
+                    && authentication.getAuthorities().stream()
+                    .anyMatch(a -> Objects.equals(a.getAuthority(), "ROLE_SUPER_ADMIN"));
+
+            if (isSuperAdmin) {
+                return new AuthorizationDecision(true);
+            }
+            assert invocation != null;
+            return delegate.authorize(authenticationSupplier, invocation);
+        };
+        return AuthorizationManagerBeforeMethodInterceptor.preAuthorize(manager);
+    }
+}

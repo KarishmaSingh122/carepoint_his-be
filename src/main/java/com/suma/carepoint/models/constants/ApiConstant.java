@@ -31,7 +31,7 @@ public class ApiConstant {
         public static final String EXISTS = "/exists";
 
         public static final String CREATE ="/create";
-        public static final String UPDATE ="/update";
+        public static final String UPDATE ="/update/{patientId}";
         public static final String DELETE ="/delete";
         public static final String INITIATE_ABHA_VERIFICATION = "/abha/initiate-verification";
         public static final String VERIFY_ABHA_OTP = "/abha/verify-otp";
@@ -360,5 +360,18 @@ public class ApiConstant {
         public static final String PROFILE="/profile/{userId}";
         public static final String REFRESH="/refresh";
         public static final String FORGOT_PASSWORD = "/forgot-password";
+    }
+
+    public static final class DateTime {
+        private DateTime() {}
+
+        public static final String DATE_DD_MM_YYYY = "dd-MM-yyyy";
+        public static final String DATE_DD_MM_YYYY_SLASH = "dd/MM/yyyy";
+        public static final String DATE_YYYY_MM_DD = "yyyy-MM-dd";
+        public static final String DATE_YYYY_MM_DD_SLASH = "yyyy/MM/dd";
+
+        public static final String TIME_HH_MM = "HH:mm";
+        public static final String TIME_HH_MM_SS = "HH:mm:ss";
+        public static final String TIME_HH_MM_AM_PM = "hh:mm a";
     }
 }
