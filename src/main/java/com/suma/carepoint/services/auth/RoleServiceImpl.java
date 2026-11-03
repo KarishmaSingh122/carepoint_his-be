@@ -79,6 +79,7 @@ public class RoleServiceImpl implements RoleService {
         List<RoleResponse> content = roles.getContent()
                 .stream()
                 .map(roleMapper::toResponse)
+                .filter(r->!r.getRoleName().equalsIgnoreCase("SUPER_ADMIN"))
                 .toList();
 
         return PageResponse.builder()

@@ -149,6 +149,7 @@ public class ApiConstant {
         public static final String GET_BY_ID = "/ward/get-by-id";
         public static final String UPDATE = "/ward/update";
         public static final String DELETE = "/ward/delete";
+        public static final String GET_BY_FLOOR = "/ward/floor";
     }
 
 

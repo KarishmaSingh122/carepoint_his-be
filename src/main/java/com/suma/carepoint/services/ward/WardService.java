@@ -18,6 +18,8 @@ public interface WardService {
     ApiResponse updateWard(Long wardId, CreateWardRequest request);
 
     ApiResponse deleteWard(Long wardId);
+
+    ApiResponse getWardByFloor(String  floorId);
 }
 
 
