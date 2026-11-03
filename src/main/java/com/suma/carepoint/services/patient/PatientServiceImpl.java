@@ -17,11 +17,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.Period;
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +39,7 @@ public class PatientServiceImpl implements PatientService {
 
     private final PatientRepository patientRepository;
     private final ModelMapper modelMapper;
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
     public ApiResponse getPatientByPatientId(Long patientId) {
@@ -66,6 +70,7 @@ public class PatientServiceImpl implements PatientService {
         Patient patient = modelMapper.map(request, Patient.class);
         patient.setAge(calculateAgeFromDob(patient));
         applyAddressRule(patient);
+        patient.setPatientMrNumber(generateMrNumber());
         Patient savedPatient = patientRepository.save(patient);
         PatientResponse response = modelMapper.map(savedPatient, PatientResponse.class);
 
@@ -203,5 +208,15 @@ public class PatientServiceImpl implements PatientService {
             return new ApiResponse(2,"Patient not found!");
         }
         return new ApiResponse(1,"Patient found!",patientRepository.existsByAbhaNumberAndActiveTrue(abhaId));
+    }
+
+    private String generateMrNumber() {
+        Long sequence = jdbcTemplate.queryForObject("SELECT nextval('patient_mr_sequence')", Long.class);
+        if (sequence == null || sequence <= 0) {
+            throw new IllegalStateException("Failed to generate Patient MR Number");
+        }
+
+        int year = LocalDate.now(Clock.system(ZoneId.of("Asia/Kolkata"))).getYear();
+        return String.format("MR-%04d-%06d", year, sequence);
     }
 }

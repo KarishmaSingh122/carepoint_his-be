@@ -1,12 +1,17 @@
 package com.suma.carepoint.controllers;
 
+import com.suma.carepoint.entities.patient.PatientPolicyDetails;
 import com.suma.carepoint.models.ApiResponse;
 import com.suma.carepoint.models.constants.ApiConstant;
+import com.suma.carepoint.models.document.BulkDocumentItem;
 import com.suma.carepoint.models.patient.CreatePatientRequest;
+import com.suma.carepoint.models.patient.PatientResponse;
 import com.suma.carepoint.models.utility.PageResponse;
 import com.suma.carepoint.security.annotation.HasPermissions;
+import com.suma.carepoint.services.document.DocumentService;
 import com.suma.carepoint.services.onehcx.abdm.OneHcxAbdmService;
 import com.suma.carepoint.services.patient.PatientService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -14,11 +19,16 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import tools.jackson.databind.ObjectMapper;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(ApiConstant.Controller.HMIS)
@@ -29,6 +39,9 @@ public class PatientController {
     private PatientService patientService;
 
     private final OneHcxAbdmService oneHcxAbdmService;
+    private final DocumentService documentService;
+    private final ObjectMapper objectMapper;
+
 
     @HasPermissions("PATIENT_READ")
     @GetMapping(ApiConstant.Patient.GET_BY_PATIENT_ID)
@@ -51,10 +64,34 @@ public class PatientController {
     }
 
     @HasPermissions("PATIENT_CREATE")
-    @PostMapping(ApiConstant.Patient.CREATE)
+    @PostMapping(value = ApiConstant.Patient.CREATE,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse> createPatient(
-            @Valid @RequestBody CreatePatientRequest request) {
-        return ResponseEntity.ok(patientService.createPatients(request, null));
+            @Valid @RequestPart("patientDetails")
+            CreatePatientRequest patientDetails,
+            @RequestPart(value = "patientPolicyDetails", required = false)
+            PatientPolicyDetails patientPolicyDetails,
+            @RequestPart(value = "documentsJson", required = false)
+            String documentsJson,
+            @RequestParam Map<String, MultipartFile> files
+    ) {
+
+        List<BulkDocumentItem> documents = documentsJson != null
+                ? objectMapper.readValue(documentsJson, objectMapper.getTypeFactory()
+                .constructCollectionType(List.class, BulkDocumentItem.class)) : List.of();
+        ApiResponse patient = patientService.createPatients(patientDetails, null);
+        PatientResponse patientResponse = (PatientResponse) patient.getData();
+        Map<String, MultipartFile> filteredFiles = files.entrySet()
+                .stream()
+                .filter(entry -> entry.getValue() != null
+                        && !entry.getValue().isEmpty()
+                        && !entry.getKey().equalsIgnoreCase("patientDetails")
+                        && !entry.getKey().equalsIgnoreCase("patientPolicyDetails")
+                        && !entry.getKey().equalsIgnoreCase("documentsJson")
+                )
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        //skipping the policy details - need to store in DB.
+        documentService.uploadDocuments(patientResponse.getPatientId(),null,null,documents, filteredFiles);
+        return ResponseEntity.ok(patient);
     }
 
     @HasPermissions("PATIENT_UPDATE")

@@ -25,7 +25,7 @@ public class PatientResponse {
 
     private String patientName;
 
-    @JsonFormat(pattern = ApiConstant.DateTime.DATE_DD_MM_YYYY)
+//    @JsonFormat(pattern = ApiConstant.DateTime.DATE_DD_MM_YYYY)
     private LocalDate patientDob;
 
     private String age;

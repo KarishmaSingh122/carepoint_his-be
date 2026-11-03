@@ -7,10 +7,7 @@ import com.suma.carepoint.entities.patient.Gender;
 import com.suma.carepoint.entities.patient.Subscriber;
 import com.suma.carepoint.models.constants.ApiConstant;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.PastOrPresent;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -30,7 +27,8 @@ public class CreatePatientRequest {
     private String patientName;
 
     @PastOrPresent(message = "Date of birth cannot be in the future")
-    @JsonFormat(pattern = ApiConstant.DateTime.DATE_DD_MM_YYYY)
+    @NotNull(message = "Birth date is required")
+//    @JsonFormat(pattern = ApiConstant.DateTime.DATE_DD_MM_YYYY)
     private LocalDate patientDob;
 
     @Size(max = 20)

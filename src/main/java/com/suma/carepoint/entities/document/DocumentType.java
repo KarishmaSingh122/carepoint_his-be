@@ -3,6 +3,8 @@ package com.suma.carepoint.entities.document;
 public enum DocumentType {
     PHOTO,
     PAN,
+    AADHAAR_BACK,
+    AADHAAR_FRONT,
     AADHAAR,
     PASSPORT,
     DRIVING_LICENSE,

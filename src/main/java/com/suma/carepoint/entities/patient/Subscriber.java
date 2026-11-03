@@ -21,7 +21,7 @@ public class Subscriber {
     private String gender;
     private String mob;
 
-    @JsonFormat(pattern = ApiConstant.DateTime.DATE_DD_MM_YYYY)
+//    @JsonFormat(pattern = ApiConstant.DateTime.DATE_DD_MM_YYYY)
     private LocalDate dob;
     private String subscriberId;
 }

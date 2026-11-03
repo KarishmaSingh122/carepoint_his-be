@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.suma.carepoint.entities.base.BaseEntity;
 import com.suma.carepoint.models.constants.ApiConstant;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.hibernate.annotations.EmbeddedColumnNaming;
@@ -30,11 +32,12 @@ public class Patient extends BaseEntity {
 //    @Pattern(regexp = ApiConstant.Regexp.CONTACT_NUMBER)
     private String abhaNumber;
 
-    @Column(name = "patient_name", length = 200)
+    @Column(name = "patient_name", length =     200)
     private String patientName;
 
     @Column(name = "date_of_birth")
-    @JsonFormat(pattern = ApiConstant.DateTime.DATE_DD_MM_YYYY)
+    @NotNull(message = "Birth date is required")
+//    @JsonFormat(pattern = ApiConstant.DateTime.DATE_DD_MM_YYYY)
     private LocalDate patientDob;
 
     @Column(name = "age")
@@ -50,7 +53,12 @@ public class Patient extends BaseEntity {
     @Column(name = "relation", length = 50)
     private String relation;
 
-    @Column(name = "patient_mr_number", length = 50)
+    @NotBlank(message = "Patient MR Number is required")
+    @Pattern(
+            regexp = "^MR-\\d{4}-\\d{6}$",
+            message = "Invalid MR Number format. Expected MR-YYYY-000001"
+    )
+    @Column(name = "patient_mr_number", length = 50, nullable = false, unique = true, updatable = false)
     private String patientMrNumber;
 
     @Column(name = "is_comm_address_same_as_card_address")
