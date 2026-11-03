@@ -27,7 +27,7 @@ public class StaffController {
 
     @PostMapping(ApiConstant.Staff.CREATE)
     public ResponseEntity<ApiResponse> createStaff(@Valid @RequestBody StaffRequest request) {
-        log.info("Create staff request received. employeeNo={}", request.getEmployeeNo());
+        log.debug("Create staff request received.");
         StaffResponse staffResponse = staffService.createStaff(request);
         ApiResponse response = new ApiResponse(1, "", staffResponse);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);

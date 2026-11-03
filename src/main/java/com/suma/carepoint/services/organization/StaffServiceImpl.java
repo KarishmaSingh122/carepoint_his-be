@@ -55,7 +55,7 @@ public class StaffServiceImpl implements StaffService {
 
     @Override
     public StaffResponse createStaff(StaffRequest request) {
-        String employeeNo = normalize(request.getEmployeeNo());
+        String employeeNo = normalize(generateEmployeeNo());
         String email = normalizeEmail(request.getEmail());
         validateDuplicateStaff(employeeNo, email, null);
         Department department = findDepartment(request.getDepartmentId());
@@ -156,7 +156,7 @@ public class StaffServiceImpl implements StaffService {
     @Override
     public StaffResponse updateStaff(Long staffId, StaffRequest request) {
         Staff staff = findStaffById(staffId);
-        String employeeNo = normalize(request.getEmployeeNo());
+        String employeeNo = normalize(staff.getEmployeeNo());
         String email = normalizeEmail(request.getEmail());
         validateDuplicateStaff(employeeNo, email, staffId);
         Department department = findDepartment(request.getDepartmentId());
@@ -238,4 +238,8 @@ public class StaffServiceImpl implements StaffService {
         return normalized.toLowerCase();
     }
 
+    private String generateEmployeeNo() {
+        int randomNumber = (int) (Math.random() * 900000) + 100000;
+        return "EMP" + randomNumber;
+    }
 }
