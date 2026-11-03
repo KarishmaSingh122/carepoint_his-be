@@ -1,12 +1,13 @@
 package com.suma.carepoint.services.patient;
 
-import com.suma.carepoint.entities.patient.Patient;
+import com.suma.carepoint.entities.patient.*;
 import com.suma.carepoint.exceptions.BadRequestException;
 import com.suma.carepoint.exceptions.ConflictException;
 import com.suma.carepoint.exceptions.ResourceNotFoundException;
 import com.suma.carepoint.models.ApiResponse;
 import com.suma.carepoint.models.patient.CreatePatientRequest;
 import com.suma.carepoint.models.patient.PatientResponse;
+import com.suma.carepoint.models.patient.PatientUpdateRequest;
 import com.suma.carepoint.models.utility.PageResponse;
 import com.suma.carepoint.repositories.patient.PatientRepository;
 import lombok.RequiredArgsConstructor;
@@ -86,19 +87,67 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Override
-    public ApiResponse updatePatient(Long patientId, CreatePatientRequest request) {
+    public ApiResponse updatePatient(Long patientId, PatientUpdateRequest requestPayload) {
 
-//        validateRequest(request);
+        CreatePatientRequest request = requestPayload.getPatientDetails();
+        PatientPolicyDetails policyDetails = requestPayload.getPatientPolicyDetails();
+
         Patient patient = findPatient(patientId);
-
         patientRepository.findByAbhaNumber(request.getAbhaNumber())
                 .filter(existing -> !existing.getPatientId().equals(patientId))
                 .ifPresent(existing -> {
                     throw new ConflictException("Patient with ABHA number already exists");
                 });
 
-        modelMapper.map(request, patient);
+        patient.setAbhaNumber(request.getAbhaNumber());
         applyAddressRule(patient);
+
+        if (request.getPatientName() != null)
+            patient.setPatientName(request.getPatientName());
+
+        if (request.getPatientDob() != null)
+            patient.setPatientDob(request.getPatientDob());
+
+        if (request.getPatientMob() != null)
+            patient.setPatientMob(request.getPatientMob());
+
+        if (request.getGender() != null)
+            patient.setGender(request.getGender());
+
+        if (request.getRelation() != null)
+            patient.setRelation(request.getRelation());
+
+        if (request.getIsCommAddressSameAsCardAddress() != null)
+            patient.setIsCommAddressSameAsCardAddress(request.getIsCommAddressSameAsCardAddress());
+
+        if (request.getIsChildRegistration() != null)
+            patient.setIsChildRegistration(request.getIsChildRegistration());
+
+        if (request.getPatientAddress() != null) {
+            if (patient.getPatientAddress() == null) {
+                patient.setPatientAddress(new Address());
+            }
+            updateAddress(patient.getPatientAddress(), request.getPatientAddress());
+        }
+
+        if (request.getPatientCommAddress() != null) {
+            if (patient.getPatientCommAddress() == null) {
+                patient.setPatientCommAddress(new Address());
+            }
+            updateAddress(patient.getPatientCommAddress(), request.getPatientCommAddress());
+        }
+
+        if (request.getContactPerson() != null) {
+            updateContactPerson(patient, request.getContactPerson());
+        }
+
+        if (request.getSubscriber() != null) {
+            updateSubscriber(patient, request.getSubscriber());
+        }
+
+        if (policyDetails != null) {
+            updatePolicyDetails(patientId, policyDetails);
+        }
         Patient updatedPatient = patientRepository.save(patient);
         PatientResponse response = modelMapper.map(updatedPatient, PatientResponse.class);
 
@@ -218,5 +267,176 @@ public class PatientServiceImpl implements PatientService {
 
         int year = LocalDate.now(Clock.system(ZoneId.of("Asia/Kolkata"))).getYear();
         return String.format("MR-%04d-%06d", year, sequence);
+    }
+
+    private void updatePatientFields(Patient patient, CreatePatientRequest request) {
+
+        if (request.getAbhaNumber() != null) {
+            patient.setAbhaNumber(request.getAbhaNumber());
+        }
+
+        if (request.getPatientName() != null) {
+            patient.setPatientName(request.getPatientName());
+        }
+
+        if (request.getPatientDob() != null) {
+            patient.setPatientDob(request.getPatientDob());
+        }
+
+        if (request.getPatientMob() != null) {
+            patient.setPatientMob(request.getPatientMob());
+        }
+
+        if (request.getGender() != null) {
+            patient.setGender(request.getGender());
+        }
+
+        if (request.getRelation() != null) {
+            patient.setRelation(request.getRelation());
+        }
+
+        if (request.getIsCommAddressSameAsCardAddress() != null) {
+            patient.setIsCommAddressSameAsCardAddress(request.getIsCommAddressSameAsCardAddress());
+        }
+
+        if (request.getIsChildRegistration() != null) {
+            patient.setIsChildRegistration(request.getIsChildRegistration());
+        }
+
+        if (request.getPatientAddress() != null) {
+            updateAddress(patient.getPatientAddress(), request.getPatientAddress());
+        }
+
+        if (request.getPatientCommAddress() != null) {
+            updateAddress(patient.getPatientCommAddress(), request.getPatientCommAddress());
+        }
+
+        if (request.getContactPerson() != null) {
+            updateContactPerson(patient, request.getContactPerson());
+        }
+
+        if (request.getSubscriber() != null) {
+            updateSubscriber(patient, request.getSubscriber());
+        }
+    }
+
+    private void updatePolicyDetails(Long patientId, PatientPolicyDetails request) {
+
+//        PatientPolicyDetails existing = policyRepository
+//                .findByPatientPatientId(patientId)
+//                .orElseGet(PatientPolicyDetails::new);
+//
+//        modelMapper.map(request, existing);
+//
+//        policyRepository.save(existing);
+    }
+
+    private void updateAddress(Address existing, Address request) {
+
+        if (request == null) {
+            return;
+        }
+
+        if (existing == null) {
+            existing = new Address();
+        }
+
+        if (request.getAddress() != null) {
+            existing.setAddress(request.getAddress());
+        }
+
+        if (request.getPincode() != null) {
+            existing.setPincode(request.getPincode());
+        }
+
+        if (request.getState() != null) {
+            existing.setState(request.getState());
+        }
+
+        if (request.getDistrict() != null) {
+            existing.setDistrict(request.getDistrict());
+        }
+
+        if (request.getVillageTownCity() != null) {
+            existing.setVillageTownCity(request.getVillageTownCity());
+        }
+    }
+
+    private void updateContactPerson(Patient patient, ContactPerson request) {
+
+        if (request == null) {
+            return;
+        }
+
+        if (patient.getContactPerson() == null) {
+            patient.setContactPerson(new ContactPerson());
+        }
+
+        ContactPerson existing = patient.getContactPerson();
+
+        if (request.getName() != null) {
+            existing.setName(request.getName());
+        }
+
+        if (request.getRelationDescription() != null) {
+            existing.setRelationDescription(request.getRelationDescription());
+        }
+
+        if (request.getRelationCode() != null) {
+            existing.setRelationCode(request.getRelationCode());
+        }
+
+        if (request.getRelationUrl() != null) {
+            existing.setRelationUrl(request.getRelationUrl());
+        }
+
+        if (request.getAddress() != null) {
+            existing.setAddress(request.getAddress());
+        }
+
+        if (request.getMobileNumber() != null) {
+            existing.setMobileNumber(request.getMobileNumber());
+        }
+
+        if (request.getGender() != null) {
+            existing.setGender(request.getGender());
+        }
+    }
+
+    private void updateSubscriber(Patient patient, Subscriber request) {
+
+        if (request == null) {
+            return;
+        }
+
+        if (patient.getSubscriber() == null) {
+            patient.setSubscriber(new Subscriber());
+        }
+
+        Subscriber existing = patient.getSubscriber();
+
+        if (request.getAbhaNumber() != null) {
+            existing.setAbhaNumber(request.getAbhaNumber());
+        }
+
+        if (request.getName() != null) {
+            existing.setName(request.getName());
+        }
+
+        if (request.getGender() != null) {
+            existing.setGender(request.getGender());
+        }
+
+        if (request.getMob() != null) {
+            existing.setMob(request.getMob());
+        }
+
+        if (request.getDob() != null) {
+            existing.setDob(request.getDob());
+        }
+
+        if (request.getSubscriberId() != null) {
+            existing.setSubscriberId(request.getSubscriberId());
+        }
     }
 }

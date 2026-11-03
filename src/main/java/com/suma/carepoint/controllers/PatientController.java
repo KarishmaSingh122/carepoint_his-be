@@ -6,6 +6,7 @@ import com.suma.carepoint.models.constants.ApiConstant;
 import com.suma.carepoint.models.document.BulkDocumentItem;
 import com.suma.carepoint.models.patient.CreatePatientRequest;
 import com.suma.carepoint.models.patient.PatientResponse;
+import com.suma.carepoint.models.patient.PatientUpdateRequest;
 import com.suma.carepoint.models.utility.PageResponse;
 import com.suma.carepoint.security.annotation.HasPermissions;
 import com.suma.carepoint.services.document.DocumentService;
@@ -98,7 +99,7 @@ public class PatientController {
     @PutMapping(ApiConstant.Patient.UPDATE)
     public ResponseEntity<ApiResponse> updatePatient(
             @PathVariable(name = "patientId") Long patientId,
-            @RequestBody CreatePatientRequest request) {
+            @RequestBody PatientUpdateRequest request) {
 
         return ResponseEntity.ok(patientService.updatePatient(patientId, request));
     }

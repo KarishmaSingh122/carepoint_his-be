@@ -2,6 +2,7 @@ package com.suma.carepoint.services.patient;
 
 import com.suma.carepoint.models.ApiResponse;
 import com.suma.carepoint.models.patient.CreatePatientRequest;
+import com.suma.carepoint.models.patient.PatientUpdateRequest;
 import com.suma.carepoint.models.utility.PageResponse;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -16,7 +17,7 @@ public interface PatientService {
 
      ApiResponse createPatients(CreatePatientRequest createPatientRequest, Map<String, MultipartFile> files);
 
-     ApiResponse updatePatient(Long patientId, CreatePatientRequest request);
+     ApiResponse updatePatient(Long patientId, PatientUpdateRequest request);
 
      ApiResponse DeletePatientByPatientId(Long patientId);
 
