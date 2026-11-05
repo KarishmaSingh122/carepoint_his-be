@@ -22,8 +22,6 @@ public class StaffResponse {
     private String specialization;
     private LocalDate joiningDate;
     private boolean active;
+    private String roleName;
     private DepartmentResponse department;
-    private Instant createdAt;
-    private Instant updatedAt;
-
 }

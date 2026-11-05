@@ -5,7 +5,7 @@
 CREATE TABLE users
 (
     user_id       BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    staff_id      BIGINT UNIQUE REFERENCES staff (staff_id),
+    staff_id      BIGINT UNIQUE REFERENCES staff (staff_id) ON DELETE CASCADE,
     username      VARCHAR(100) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
     active       BOOLEAN NOT NULL DEFAULT true,

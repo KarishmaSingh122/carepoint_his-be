@@ -20,4 +20,6 @@ public interface UserService {
     UserResponse updateStatus(Long userId, boolean active);
 
     void delete(Long userId);
+
+    UserResponse updateStatusByStaffId(Long staffId, boolean active);
 }

@@ -30,41 +30,80 @@ public interface StaffRepository extends JpaRepository<Staff, Long> {
     Page<Staff> findByActiveTrue(Pageable pageable);
 
     @Query("""
-            SELECT s
-            FROM Staff s
-            JOIN s.department d
-            WHERE
-                (
-                    CAST(:search AS string) IS NULL
-                    OR LOWER(s.employeeNo)
-                        LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))
-                    OR LOWER(s.firstName)
-                        LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))
-                    OR LOWER(s.lastName)
-                        LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))
-                    OR LOWER(CONCAT(s.firstName, ' ', s.lastName))
-                        LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))
-                    OR LOWER(s.email)
-                        LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))
-                    OR LOWER(s.designation)
-                        LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))
-                    OR LOWER(s.specialization)
-                        LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))
-                    OR LOWER(d.departmentName)
-                        LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))
-                    OR LOWER(d.departmentCode)
-                        LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))
-                )
-            AND
-                (
-                    :active IS NULL
-                    OR s.active = :active
-                )
-            AND
-                (
-                    :departmentId IS NULL
-                    OR d.departmentId = :departmentId
-                )
-            """)
-    Page<Staff> searchStaff(@Param("search") String search, @Param("active") Boolean active, @Param("departmentId") Long departmentId, Pageable pageable);
+        SELECT s
+        FROM Staff s
+        JOIN s.department d
+        WHERE
+            (
+                CAST(:search AS string) IS NULL
+                OR LOWER(s.employeeNo)
+                    LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))
+                OR LOWER(s.firstName)
+                    LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))
+                OR LOWER(s.lastName)
+                    LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))
+                OR LOWER(CONCAT(s.firstName, ' ', s.lastName))
+                    LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))
+                OR LOWER(s.email)
+                    LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))
+                OR LOWER(s.designation)
+                    LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))
+                OR LOWER(s.specialization)
+                    LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))
+                OR LOWER(d.departmentName)
+                    LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))
+                OR LOWER(d.departmentCode)
+                    LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))
+            )
+        AND (:active IS NULL OR s.active = :active)
+        AND (:departmentId IS NULL OR d.departmentId = :departmentId)
+        AND (
+            :isSuperAdmin = true
+            OR :isHospitalAdmin = true
+        )
+        AND s.staffId <> :currentStaffId
+        AND NOT EXISTS (
+            SELECT ur.id
+            FROM UserRole ur
+            WHERE ur.user.staff.staffId = s.staffId
+              AND UPPER(ur.role.roleName) = 'SUPER_ADMIN'
+        )
+        AND (
+            :isSuperAdmin = true
+            OR NOT EXISTS (
+                SELECT ur.id
+                FROM UserRole ur
+                WHERE ur.user.staff.staffId = s.staffId
+                  AND UPPER(ur.role.roleName) = 'HOSPITAL_ADMIN'
+            )
+        )
+        """)
+    Page<Staff> searchStaff(
+            @Param("search") String search,
+            @Param("active") Boolean active,
+            @Param("departmentId") Long departmentId,
+            @Param("currentStaffId") Long currentStaffId,
+            @Param("isSuperAdmin") boolean isSuperAdmin,
+            @Param("isHospitalAdmin") boolean isHospitalAdmin,
+            Pageable pageable
+    );
+
+    @Query("""
+        SELECT s
+        FROM Staff s
+        WHERE s.active = true
+          AND (
+              :isSuperAdmin = true
+              OR (
+                  s.staffId <> :currentStaffId
+                  AND NOT EXISTS (
+                      SELECT ur.id
+                      FROM UserRole ur
+                      WHERE ur.user.staff.staffId = s.staffId
+                        AND UPPER(ur.role.roleName) IN ('SUPER_ADMIN', 'HOSPITAL_ADMIN')
+                  )
+              )
+          )
+        """)
+    Page<Staff> findVisibleActiveStaff(@Param("currentStaffId") Long currentStaffId, @Param("isSuperAdmin") boolean isSuperAdmin, Pageable pageable);
 }

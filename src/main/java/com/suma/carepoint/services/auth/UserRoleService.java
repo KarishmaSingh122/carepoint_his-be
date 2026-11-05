@@ -5,6 +5,7 @@ import com.suma.carepoint.models.auth.UserRoleRequest;
 import com.suma.carepoint.models.auth.UserRoleResponse;
 
 import java.util.List;
+import java.util.Map;
 
 public interface UserRoleService {
 
@@ -17,4 +18,6 @@ public interface UserRoleService {
     List<UserRoleResponse> getUsersByRole(Long roleId);
 
     void removeRole(Long userId, Long roleId);
+
+    Map<Long, String> getRoleNamesByStaffIds(List<Long> staffIds);
 }

@@ -8,6 +8,7 @@ import com.suma.carepoint.models.auth.RoleResponse;
 import com.suma.carepoint.models.mapper.RoleMapper;
 import com.suma.carepoint.models.utility.PageResponse;
 import com.suma.carepoint.repositories.auth.RoleRepository;
+import com.suma.carepoint.security.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -28,6 +29,7 @@ public class RoleServiceImpl implements RoleService {
 
     private final RoleRepository roleRepository;
     private final RoleMapper roleMapper;
+    private final CurrentUserService currentUserService;
 
     @Override
     public RoleResponse create(RoleRequest request) {
@@ -79,7 +81,18 @@ public class RoleServiceImpl implements RoleService {
         List<RoleResponse> content = roles.getContent()
                 .stream()
                 .map(roleMapper::toResponse)
-                .filter(r->!r.getRoleName().equalsIgnoreCase("SUPER_ADMIN"))
+                .filter(role -> {
+                    if (currentUserService.hasRole("SUPER_ADMIN")) {
+                        return !role.getRoleName().equalsIgnoreCase("SUPER_ADMIN");
+                    }
+
+                    if (currentUserService.hasRole("HOSPITAL_ADMIN")) {
+                        return !role.getRoleName().equalsIgnoreCase("SUPER_ADMIN")
+                                && !role.getRoleName().equalsIgnoreCase("HOSPITAL_ADMIN");
+                    }
+
+                    return true;
+                })
                 .toList();
 
         return PageResponse.builder()

@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,11 +26,12 @@ public class StaffController {
 
     private final StaffService staffService;
 
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'HOSPITAL_ADMIN')")
     @PostMapping(ApiConstant.Staff.CREATE)
     public ResponseEntity<ApiResponse> createStaff(@Valid @RequestBody StaffRequest request) {
         log.debug("Create staff request received.");
         StaffResponse staffResponse = staffService.createStaff(request);
-        ApiResponse response = new ApiResponse(1, "", staffResponse);
+        ApiResponse response = new ApiResponse(1, "Staff registered successful.", staffResponse);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -37,10 +39,11 @@ public class StaffController {
     public ResponseEntity<ApiResponse> getStaffById(
             @PathVariable @Min(value = 1, message = "Staff ID must be positive") Long staffId) {
         StaffResponse staffResponse = staffService.getStaffById(staffId);
-        ApiResponse response = new ApiResponse(1, "", staffResponse);
+        ApiResponse response = new ApiResponse(1, "Staff by id received successful.", staffResponse);
         return ResponseEntity.ok().body(response);
     }
 
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'HOSPITAL_ADMIN')")
     @GetMapping(ApiConstant.Staff.GET_ALL)
     public ResponseEntity<ApiResponse> getStaff(
             @RequestParam(required = false) String search,
@@ -50,57 +53,63 @@ public class StaffController {
             @RequestParam(defaultValue = "20") @Min(value = 1, message = "Size must be greater than 0")
             @Max(value = 100, message = "Size must not exceed 100") int size) {
         PageResponse staffPageResponse = staffService.getStaff(search, active, departmentId, page, size);
-        ApiResponse response = new ApiResponse(1, "", staffPageResponse);
+        ApiResponse response = new ApiResponse(1, "Staff received successful.", staffPageResponse);
         return ResponseEntity.ok().body(response);
     }
 
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'HOSPITAL_ADMIN')")
     @GetMapping(ApiConstant.Staff.GET_ACTIVE)
     public ResponseEntity<ApiResponse> getActiveStaff(
             @RequestParam(defaultValue = "0") @Min(0) int page,
             @RequestParam(defaultValue = "20") @Min(1) @Max(100) int size) {
         PageResponse staffPageResponse = staffService.getActiveStaff(page, size);
-        ApiResponse response = new ApiResponse(1, "", staffPageResponse);
+        ApiResponse response = new ApiResponse(1, "Active staff received successful.", staffPageResponse);
         return ResponseEntity.ok().body(response);
     }
 
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'HOSPITAL_ADMIN')")
     @GetMapping(ApiConstant.Staff.GET_BY_DEPARTMENT)
     public ResponseEntity<ApiResponse> getStaffByDepartment(
             @RequestParam @Min(value = 1, message = "Department ID must be positive") Long departmentId,
             @RequestParam(defaultValue = "0") @Min(0) int page,
             @RequestParam(defaultValue = "20") @Min(1) @Max(100) int size) {
         PageResponse staffPageResponse = staffService.getStaffByDepartment(departmentId, page, size);
-        ApiResponse response = new ApiResponse(1, "", staffPageResponse);
+        ApiResponse response = new ApiResponse(1, "Staff by department received successful.", staffPageResponse);
         return ResponseEntity.ok().body(response);
     }
 
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'HOSPITAL_ADMIN')")
     @GetMapping(ApiConstant.Staff.GET_BY_DESIGNATION)
     public ResponseEntity<ApiResponse> getStaffByDesignation(
             @RequestParam String designation,
             @RequestParam(defaultValue = "0") @Min(0) int page,
             @RequestParam(defaultValue = "20") @Min(1) @Max(100) int size) {
         PageResponse staffPageResponse = staffService.getStaffByDesignation(designation, page, size);
-        ApiResponse response = new ApiResponse(1, "", staffPageResponse);
+        ApiResponse response = new ApiResponse(1, "Staff by designation received successful.", staffPageResponse);
         return ResponseEntity.ok().body(response);
     }
 
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'HOSPITAL_ADMIN')")
     @PutMapping(ApiConstant.Staff.UPDATE)
     public ResponseEntity<ApiResponse> updateStaff(
             @PathVariable @Min(value = 1, message = "Staff ID must be positive") Long staffId,
             @Valid @RequestBody StaffRequest request) {
         StaffResponse staffResponse = staffService.updateStaff(staffId, request);
-        ApiResponse response = new ApiResponse(1, "", staffResponse);
+        ApiResponse response = new ApiResponse(1, "Staff updated successful.", staffResponse);
         return ResponseEntity.ok().body(response);
     }
 
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'HOSPITAL_ADMIN')")
     @PatchMapping(ApiConstant.Staff.UPDATE_STATUS)
     public ResponseEntity<ApiResponse> updateStaffStatus(
-            @PathVariable @Min(value = 1, message = "Staff ID must be positive") Long staffId,
+            @PathVariable @Min(1) Long staffId,
             @RequestParam boolean status) {
         StaffResponse staffResponse = staffService.updateStaffStatus(staffId, status);
-        ApiResponse response = new ApiResponse(1, "", staffResponse);
-        return ResponseEntity.ok().body(response);
+        return ResponseEntity.ok().body(
+                new ApiResponse(1, "Staff status changed successful.", staffResponse));
     }
 
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'HOSPITAL_ADMIN')")
     @DeleteMapping(ApiConstant.Staff.DELETE)
     public ResponseEntity<ApiResponse> deleteStaff(
             @PathVariable @Min(value = 1, message = "Staff ID must be positive") Long staffId) {

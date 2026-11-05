@@ -32,6 +32,7 @@ public class UserController {
     }
 
     @GetMapping(ApiConstant.User.GET_BY_ID)
+
     public ResponseEntity<ApiResponse> getById(@PathVariable @Min(1) Long userId) {
 
         UserResponse response = userService.getById(userId);
