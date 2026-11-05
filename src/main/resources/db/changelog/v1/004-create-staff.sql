@@ -2,6 +2,14 @@
 
 --changeset carepoint:004
 
+CREATE SEQUENCE IF NOT EXISTS employee_number_sequence
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
 CREATE TABLE staff
 (
     staff_id       BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,

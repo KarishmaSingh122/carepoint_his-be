@@ -13,23 +13,25 @@ import java.util.Optional;
 
 @Repository
 public interface PatientRepository  extends JpaRepository<Patient,Long> {
-    Optional<Patient> findByAbhaId(String abhaId);
+
+    Optional<Patient> findByAbhaNumber(String abhaNumber);
+
+    Page<Patient> findByActive(Boolean active, Pageable pageable);
 
     @Query("""
         SELECT p
         FROM Patient p
         WHERE
             CAST(p.patientId AS string) LIKE CONCAT('%', :keyword, '%')
-            OR LOWER(p.abhaId) LIKE LOWER(CONCAT('%', :keyword, '%'))
-            OR LOWER(p.phone) LIKE LOWER(CONCAT('%', :keyword, '%'))
-            OR LOWER(p.firstName) LIKE LOWER(CONCAT('%', :keyword, '%'))
-            OR LOWER(p.lastName) LIKE LOWER(CONCAT('%', :keyword, '%'))
-        ORDER BY p.firstName ASC, p.lastName ASC
+            OR LOWER(p.abhaNumber) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            OR LOWER(p.patientMob) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            OR LOWER(p.patientName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+        ORDER BY p.patientName ASC
     """)
     List<Patient> searchByKeyword(@Param("keyword") String keyword);
 
-    Page<Patient> findByActive(boolean active, Pageable pageable);
+    boolean existsByAbhaNumber(String abhaId);
 
-    boolean existsByAbhaId(String abhaId);
-    boolean existsByAbhaIdAndActiveTrue(String abhaId);
+    boolean existsByAbhaNumberAndActiveTrue(String abhaId);
+
 }

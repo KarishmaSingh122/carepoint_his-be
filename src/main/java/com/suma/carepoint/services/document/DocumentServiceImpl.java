@@ -19,6 +19,7 @@ import com.suma.carepoint.repositories.auth.UserRepository;
 import com.suma.carepoint.repositories.document.DocumentRepository;
 import com.suma.carepoint.repositories.patient.PatientRepository;
 import com.suma.carepoint.repositories.visit.VisitRepository;
+import com.suma.carepoint.security.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.FileSystemResource;
@@ -55,15 +56,16 @@ public class DocumentServiceImpl implements DocumentService {
     private final AdmissionRepository admissionRepository;
     private final UserRepository userRepository;
     private final DocumentMapper documentMapper;
+    private final CurrentUserService currentUserService;
 
 
     @Override
-    public DocumentResponse upload(Long patientId, Long uploadedBy,
-                                   DocumentRequest request, MultipartFile file) {
+    public DocumentResponse upload(Long patientId, DocumentRequest request, MultipartFile file) {
         validateFile(file);
         Patient patient = patientRepository.findById(patientId)
                 .orElseThrow(() -> new ResourceNotFoundException("Patient not found"));
 
+        Long uploadedBy = currentUserService.getCurrentUserId();
         User user = userRepository.findByUserId(uploadedBy)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         Visit visit = resolveVisit(request.getVisitId());
@@ -306,7 +308,7 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public List<DocumentResponse> uploadDocuments(
-            Long patientId, Long uploadedBy, Long visitId, Long admissionId,
+            Long patientId, Long visitId, Long admissionId,
             List<BulkDocumentItem> documents, Map<String, MultipartFile> files) {
 
         validateBulkRequest(documents, files);
@@ -314,6 +316,7 @@ public class DocumentServiceImpl implements DocumentService {
         Patient patient = patientRepository.findById(patientId)
                 .orElseThrow(() -> new ResourceNotFoundException("Patient not found"));
 
+        Long uploadedBy = currentUserService.getCurrentUserId();
         User user = userRepository.findByUserId(uploadedBy)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 

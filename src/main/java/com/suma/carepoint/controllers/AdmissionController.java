@@ -63,13 +63,11 @@ public class AdmissionController {
     @GetMapping(ApiConstant.Admission.GET_BY_PATIENT_ID_OR_ABHA_ID)
     public ResponseEntity<ApiResponse> getAllAdmissions(
             @RequestParam(required = false) Long patientId,
-            @RequestParam(required = false) String abhaId,
+            @RequestParam(required = false) String abhaNumber,
             @RequestParam(defaultValue = "0") @Min(0) int page,
             @RequestParam(defaultValue = "20") @Min(1) @Max(100) int size) {
 
-        return ResponseEntity.ok(
-                admissionService.getAllAdmissions(patientId, abhaId, page, size)
-        );
+        return ResponseEntity.ok(admissionService.getAllAdmissions(patientId, abhaNumber, page, size));
     }
 }
 

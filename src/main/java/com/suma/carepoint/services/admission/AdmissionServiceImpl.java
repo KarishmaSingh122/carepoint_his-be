@@ -149,7 +149,7 @@ public class AdmissionServiceImpl implements AdmissionService {
             admissionResponse = modelMapper.map(admission, AdmissionResponse.class);
             if (admission.getPatient() != null) {
                 admissionResponse.setPatientId(admission.getPatient().getPatientId());
-                admissionResponse.setPatientName(admission.getPatient().getFirstName() + " " + admission.getPatient().getLastName());
+                admissionResponse.setPatientName(admission.getPatient().getPatientName());
             }
 
             if (admission.getAdmittingDoctor() != null) {
@@ -186,7 +186,7 @@ public class AdmissionServiceImpl implements AdmissionService {
 
                         if (admission.getPatient() != null) {
                             response.setPatientId(admission.getPatient().getPatientId());
-                            response.setPatientName(admission.getPatient().getFirstName() + " " + admission.getPatient().getLastName());
+                            response.setPatientName(admission.getPatient().getPatientName());
                         }
 
                         if (admission.getAdmittingDoctor() != null) {
@@ -720,7 +720,7 @@ public class AdmissionServiceImpl implements AdmissionService {
 
                         if (admission.getPatient() != null) {
                             response.setPatientId(admission.getPatient().getPatientId());
-                            response.setPatientName(admission.getPatient().getFirstName() + " " + admission.getPatient().getLastName());
+                            response.setPatientName(admission.getPatient().getPatientName());
                         }
 
                         if (admission.getAdmittingDoctor() != null) {
@@ -760,13 +760,13 @@ public class AdmissionServiceImpl implements AdmissionService {
     }
 
     @Override
-    public ApiResponse getAllAdmissions(Long patientId, String abhaId, int page, int size) {
+    public ApiResponse getAllAdmissions(Long patientId, String abhaNumber, int page, int size) {
         try {
-            if (patientId == null && (abhaId == null || abhaId.isBlank())) {
+            if (patientId == null && (abhaNumber == null || abhaNumber.isBlank())) {
                 return new ApiResponse(2, "Patient ID or ABHA ID is required", null);
             }
 
-            if (patientId != null && abhaId != null && !abhaId.isBlank()) {
+            if (patientId != null && abhaNumber != null && !abhaNumber.isBlank()) {
                 return new ApiResponse(2, "Provide either patient ID or ABHA ID, not both", null);
             }
 
@@ -781,7 +781,7 @@ public class AdmissionServiceImpl implements AdmissionService {
             if (patientId != null) {
                 admissionPage = admissionRepository.findByPatient_PatientId(patientId, pageable);
             } else {
-                admissionPage = admissionRepository.findByPatient_AbhaId(abhaId, pageable);
+                admissionPage = admissionRepository.findByPatient_AbhaNumber(abhaNumber, pageable);
             }
 
             List<AdmissionResponse> admissionResponses = admissionPage.getContent()
@@ -794,10 +794,7 @@ public class AdmissionServiceImpl implements AdmissionService {
 
                         if (admission.getPatient() != null) {
                             response.setPatientId(admission.getPatient().getPatientId());
-                            response.setPatientName(
-                                    admission.getPatient().getFirstName() + " " +
-                                            admission.getPatient().getLastName()
-                            );
+                            response.setPatientName(admission.getPatient().getPatientName());
                         }
 
                         if (admission.getAdmittingDoctor() != null) {
@@ -843,17 +840,14 @@ public class AdmissionServiceImpl implements AdmissionService {
         return TreatmentWorkspacePatientResponse.builder()
                 .patientId(patient.getPatientId())
                 .patientName(
-                        Stream.of(
-                                        patient.getFirstName(),
-                                        patient.getLastName()
-                                )
+                        Stream.of(patient.getPatientName())
                                 .filter(Objects::nonNull)
                                 .filter(name -> !name.isBlank())
                                 .collect(Collectors.joining(" "))
                 )
                 .gender(String.valueOf(patient.getGender()))
-                .dateOfBirth(patient.getDateOfBirth())
-                .mobileNo(patient.getPhone())
+                .dateOfBirth(patient.getPatientDob())
+                .mobileNo(patient.getPatientMob())
                 .build();
     }
 

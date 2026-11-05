@@ -11,6 +11,7 @@ import com.suma.carepoint.models.auth.UserRoleRequest;
 import com.suma.carepoint.models.auth.UserRoleResponse;
 import com.suma.carepoint.models.mapper.UserRoleMapper;
 import com.suma.carepoint.repositories.auth.RoleRepository;
+import com.suma.carepoint.repositories.auth.StaffRoleProjection;
 import com.suma.carepoint.repositories.auth.UserRepository;
 import com.suma.carepoint.repositories.auth.UserRoleRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -101,5 +105,20 @@ public class UserRoleServiceImpl implements UserRoleService {
                 .orElseThrow(() -> new ResourceNotFoundException("User role assignment not found"));
         userRoleRepository.delete(userRole);
         log.info("Role removed successfully. userId={}, roleId={}", userId, roleId);
+    }
+
+    @Override
+    public Map<Long, String> getRoleNamesByStaffIds(List<Long> staffIds) {
+
+        if (staffIds == null || staffIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return userRoleRepository.findStaffRoles(staffIds)
+                .stream()
+                .collect(Collectors.toMap(
+                        StaffRoleProjection::getStaffId,
+                        StaffRoleProjection::getRoleName,
+                        (existing, replacement) -> existing
+                ));
     }
 }

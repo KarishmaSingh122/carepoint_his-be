@@ -207,5 +207,23 @@ public class WardServiceImpl implements WardService{
             return new ApiResponse(2, "", null);
         }
     }
+
+    @Override
+    public ApiResponse getWardByFloor(String floorName) {
+
+        List<Ward> wards = wardRepository.findByFloorName(floorName);
+        List<WardResponse> responses = wards.stream().map(ward -> {
+            WardResponse response = new WardResponse();
+            response.setWardId(ward.getWardId());
+            response.setDepartmentId(ward.getDepartment() != null ? ward.getDepartment().getDepartmentId() : null);
+            response.setFloorId(ward.getFloor() != null ? ward.getFloor().getFloorId() : null);
+            response.setWardName(ward.getWardName());
+            response.setWardType(ward.getWardType());
+            response.setActive(ward.getActive());
+            return response;
+        }).toList();
+
+        return new ApiResponse(1, "", responses, (long) responses.size());
+    }
 }
 

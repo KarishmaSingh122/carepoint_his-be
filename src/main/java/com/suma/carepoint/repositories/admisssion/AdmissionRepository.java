@@ -26,12 +26,7 @@ public interface AdmissionRepository extends JpaRepository<Admission,Long>{
     WHERE a.status = 'ADMITTED'
       AND (
             CAST(a.admissionNumber AS string) LIKE CONCAT('%', :keyword, '%')
-            OR LOWER(p.firstName) LIKE LOWER(CONCAT('%', :keyword, '%'))
-            OR LOWER(p.lastName) LIKE LOWER(CONCAT('%', :keyword, '%'))
-            OR LOWER(CONCAT(p.firstName, ' ', p.lastName))
-                LIKE LOWER(CONCAT('%', :keyword, '%'))
-            OR LOWER(CONCAT(p.lastName, ' ', p.firstName))
-                LIKE LOWER(CONCAT('%', :keyword, '%'))
+            OR LOWER(p.patientName) LIKE LOWER(CONCAT('%', :keyword, '%'))
           )
     ORDER BY a.admissionId DESC
 """)
@@ -41,5 +36,5 @@ public interface AdmissionRepository extends JpaRepository<Admission,Long>{
 
     Page<Admission> findByPatient_PatientId(Long patientId, Pageable pageable);
 
-    Page<Admission> findByPatient_AbhaId(String abhaId, Pageable pageable);
+    Page<Admission> findByPatient_AbhaNumber(String abhaNumber, Pageable pageable);
 }

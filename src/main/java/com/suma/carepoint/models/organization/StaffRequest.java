@@ -16,11 +16,6 @@ import static com.suma.carepoint.models.constants.ApiConstant.Regexp.CONTACT_NUM
 @AllArgsConstructor
 public class StaffRequest {
 
-    @NotBlank(message = "Employee number is required")
-    @Size(max = 30, message = "Employee number must not exceed 30 characters")
-    @Pattern(regexp = ALPHANUMERIC_DASH_UNDERSCORE, message = "Employee number contains invalid characters")
-    private String employeeNo;
-
     @NotBlank(message = "First name is required")
     @Size(max = 100, message = "First name must not exceed 100 characters")
     private String firstName;

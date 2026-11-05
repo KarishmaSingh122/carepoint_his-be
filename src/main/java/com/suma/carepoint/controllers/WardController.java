@@ -40,5 +40,9 @@ public class WardController {
         return ResponseEntity.ok().body(wardService.deleteWard(wardId));
     }
 
+    @GetMapping(ApiConstant.Ward.GET_BY_FLOOR)
+    public ResponseEntity<ApiResponse> getWardByFloor(@RequestParam("floor") String floorName) {
+        return ResponseEntity.ok().body(wardService.getWardByFloor(floorName));
+    }
 
 }

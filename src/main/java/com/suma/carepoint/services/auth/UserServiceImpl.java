@@ -13,6 +13,7 @@ import com.suma.carepoint.repositories.auth.UserRepository;
 import com.suma.carepoint.repositories.organization.StaffRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -109,8 +110,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse getByStaffId(Long staffId) {
-        User user = userRepository.findByStaffStaffId(staffId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found for staff"));
+        User user = findUserByStaffId(staffId);
         return userMapper.toResponse(user);
     }
 
@@ -156,7 +156,16 @@ public class UserServiceImpl implements UserService {
         User user = findUser(userId);
         user.setActive(active);
         User updated = userRepository.save(user);
-        log.info("User status updated. userId={}, active={}", userId, active);
+        log.debug("User status updated.");
+        return userMapper.toResponse(updated);
+    }
+
+    @Override
+    public UserResponse updateStatusByStaffId(Long staffId, boolean active) {
+        User user = findUserByStaffId(staffId);
+        user.setActive(active);
+        User updated = userRepository.save(user);
+        log.debug("User status updated.");
         return userMapper.toResponse(updated);
     }
 
@@ -184,5 +193,10 @@ public class UserServiceImpl implements UserService {
         }
         return staffRepository.findById(staffId)
                 .orElseThrow(() -> new ResourceNotFoundException("Staff not found"));
+    }
+
+    private User findUserByStaffId(Long staffId) {
+        return userRepository.findByStaffStaffId(staffId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found for staff ID: " + staffId));
     }
 }

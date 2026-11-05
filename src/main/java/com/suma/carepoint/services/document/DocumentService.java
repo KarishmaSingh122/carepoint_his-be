@@ -13,7 +13,7 @@ import java.util.Map;
 
 public interface DocumentService {
 
-    DocumentResponse upload(Long patientId, Long uploadedBy, DocumentRequest request, MultipartFile file);
+    DocumentResponse upload(Long patientId, DocumentRequest request, MultipartFile file);
 
     DocumentResponse getById(Long documentId);
 
@@ -27,7 +27,7 @@ public interface DocumentService {
     void delete(Long documentId);
 
     List<DocumentResponse> uploadDocuments(
-            Long patientId, Long uploadedBy, Long visitId, Long admissionId,
+            Long patientId, Long visitId, Long admissionId,
             List<BulkDocumentItem> documents, Map<String, MultipartFile> files);
 
 }
